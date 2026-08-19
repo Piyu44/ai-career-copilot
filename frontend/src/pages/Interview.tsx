@@ -147,7 +147,7 @@ export default function InterviewPage() {
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {TYPES.map((t) => (
                     <button key={t.id} onClick={() => setType(t.id)}
-                      className={cn("rounded-lg px-3 py-2.5 text-[13px] font-bold ring-1 transition-all", type === t.id ? "bg-brand-700 text-white ring-brand-700 shadow-pop" : "bg-white text-ink-600 ring-ink-200 hover:ring-brand-300")}>
+                      className={cn("rounded-lg px-3 py-2.5 text-[13px] font-bold ring-1 backdrop-blur-sm transition-all", type === t.id ? "bg-gradient-to-b from-brand-500 to-brand-700 text-white ring-brand-400/50 shadow-[inset_0_1px_0_rgba(255,255,255,.3),0_10px_22px_-8px_rgba(139,92,246,.6)]" : "bg-white/[0.05] text-ink-500 ring-white/12 hover:ring-brand-400/35 hover:text-white")}>
                       {t.label}
                     </button>
                   ))}
@@ -158,7 +158,7 @@ export default function InterviewPage() {
                 <div className="grid grid-cols-3 gap-2">
                   {DIFFS.map((d) => (
                     <button key={d} onClick={() => setDifficulty(d)}
-                      className={cn("rounded-lg px-3 py-2.5 text-[13px] font-bold capitalize ring-1 transition-all", difficulty === d ? "bg-ink-900 text-white ring-ink-900" : "bg-white text-ink-600 ring-ink-200 hover:ring-brand-300")}>
+                      className={cn("rounded-lg px-3 py-2.5 text-[13px] font-bold capitalize ring-1 backdrop-blur-sm transition-all", difficulty === d ? "bg-white text-coal-950 ring-white/40 shadow-[0_8px_20px_-8px_rgba(255,255,255,.35)]" : "bg-white/[0.05] text-ink-500 ring-white/12 hover:ring-brand-400/35 hover:text-white")}>
                       {d}
                     </button>
                   ))}
@@ -195,7 +195,8 @@ export default function InterviewPage() {
                 </div>
               )}
             </Card>
-            <div className="rounded-2xl bg-ink-900 p-6 text-white">
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-coal-700 to-coal-950 p-6 text-white ring-1 ring-brand-400/20">
+              <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-brand-600/30 blur-2xl" />
               <Mic className="h-6 w-6 text-brand-300" />
               <h3 className="mt-3 font-display text-lg font-bold">How scoring works</h3>
               <ul className="mt-3 space-y-2 text-[13px] leading-relaxed text-ink-300">
@@ -230,7 +231,8 @@ export default function InterviewPage() {
         </div>
 
         <Card className="overflow-hidden">
-          <div className="border-b border-ink-100 bg-ink-900 p-6 text-white">
+          <div className="relative overflow-hidden border-b border-white/10 bg-gradient-to-br from-coal-700 to-coal-950 p-6 text-white">
+            <div className="pointer-events-none absolute -left-12 -top-12 h-32 w-32 rounded-full bg-brand-600/25 blur-2xl" />
             <div className="flex items-start gap-3.5">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-sm font-bold">AI</span>
               <div>
@@ -247,7 +249,7 @@ export default function InterviewPage() {
                 onChange={(e) => setAnswer(e.target.value)}
                 rows={7}
                 placeholder="Type your answer as you'd speak it in the interview…"
-                className="w-full rounded-xl bg-ink-50/60 p-4 text-[14px] leading-relaxed text-ink-800 ring-1 ring-ink-200 placeholder:text-ink-300 focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                className="w-full rounded-xl bg-white/[0.06] p-4 text-[14px] leading-relaxed text-ink-800 ring-1 ring-white/12 backdrop-blur-sm placeholder:text-ink-300 focus:bg-white/[0.09] focus:ring-2 focus:ring-brand-400/60 focus:outline-none"
               />
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
@@ -298,7 +300,7 @@ export default function InterviewPage() {
                   <span className="flex items-center gap-2 text-[13px] font-bold text-brand-800"><Lightbulb className="h-4 w-4" /> Study a stronger answer</span>
                   <ChevronDown className={cn("h-4 w-4 text-brand-600 transition-transform", showBetter && "rotate-180")} />
                 </button>
-                {showBetter && <p className="bg-white px-4 py-3.5 text-[13.5px] leading-relaxed text-ink-600">{evalRes.better}</p>}
+                {showBetter && <p className="bg-white/[0.04] px-4 py-3.5 text-[13.5px] leading-relaxed text-ink-600">{evalRes.better}</p>}
               </div>
 
               <div className="mt-6 flex justify-end">

@@ -62,7 +62,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         {items.map((t) => (
           <div
             key={t.id}
-            className="pointer-events-auto relative flex items-start gap-3 overflow-hidden rounded-xl bg-white p-4 pr-9 shadow-lift ring-1 ring-ink-100 animate-fade-up"
+            className="glass-deep pointer-events-auto relative flex items-start gap-3 overflow-hidden rounded-xl p-4 pr-9 animate-fade-up"
           >
             <span className={`absolute inset-y-0 left-0 w-1 ${toneStyle[t.tone].bar}`} />
             <span className="mt-0.5 shrink-0">{toneStyle[t.tone].icon}</span>

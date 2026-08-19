@@ -78,6 +78,35 @@ export function usePageMeta(title: string, description?: string) {
   }, [title, description]);
 }
 
+/** Mouse-follow 3D tilt — sets --rx/--ry/--gx/--gy vars consumed by .tilt-card / .tilt-glare */
+export function useTilt<T extends HTMLElement = HTMLDivElement>(max = 7) {
+  const ref = useRef<T | null>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const move = (e: MouseEvent) => {
+      const r = el.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top) / r.height;
+      el.style.setProperty("--ry", `${((px - 0.5) * 2 * max).toFixed(2)}deg`);
+      el.style.setProperty("--rx", `${((0.5 - py) * 2 * max).toFixed(2)}deg`);
+      el.style.setProperty("--gx", `${(px * 100).toFixed(1)}%`);
+      el.style.setProperty("--gy", `${(py * 100).toFixed(1)}%`);
+    };
+    const leave = () => {
+      el.style.setProperty("--rx", "0deg");
+      el.style.setProperty("--ry", "0deg");
+    };
+    el.addEventListener("mousemove", move);
+    el.addEventListener("mouseleave", leave);
+    return () => {
+      el.removeEventListener("mousemove", move);
+      el.removeEventListener("mouseleave", leave);
+    };
+  }, [max]);
+  return ref;
+}
+
 /** Body-scroll lock for modals/drawers */
 export function useBodyLock(locked: boolean) {
   useEffect(() => {

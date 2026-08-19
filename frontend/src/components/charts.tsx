@@ -18,8 +18,11 @@ import {
 
 const tooltipStyle = {
   borderRadius: 10,
-  border: "1px solid var(--color-ink-100)",
-  boxShadow: "0 12px 28px -14px rgba(20,21,46,.25)",
+  border: "1px solid rgba(255,255,255,0.12)",
+  background: "rgba(17,12,32,0.92)",
+  backdropFilter: "blur(12px)",
+  color: "#f4f2fc",
+  boxShadow: "0 18px 40px -16px rgba(2,0,12,.8)",
   fontSize: 12,
   fontFamily: "var(--font-sans)",
 };
@@ -65,7 +68,7 @@ export function TrendArea({
   );
 }
 
-const BAR_COLORS = ["#7437d4", "#8b57e3", "#a67dee", "#d97706", "#0ea5e9", "#10b981"];
+const BAR_COLORS = ["#a78bfa", "#c4b5fd", "#8b5cf6", "#fbbf24", "#38bdf8", "#34d399"];
 
 export function CategoryBars({
   data,

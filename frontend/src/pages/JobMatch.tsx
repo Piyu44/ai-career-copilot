@@ -226,7 +226,7 @@ export default function JobMatch() {
               )}
             >
               <input ref={fileRef} type="file" accept=".pdf,.docx,.doc,.txt,.md" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
-              <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-brand-600 shadow-card ring-1 ring-ink-100">
+              <span className="glass-deep flex h-14 w-14 items-center justify-center rounded-2xl text-brand-300 shadow-[0_0_30px_rgba(139,92,246,.25)]">
                 <Upload className="h-6 w-6" />
               </span>
               <p className="mt-4 text-sm font-bold text-ink-800">Drop your resume here, or click to browse</p>

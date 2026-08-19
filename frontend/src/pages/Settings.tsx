@@ -123,7 +123,8 @@ export default function SettingsPage() {
         <div className="space-y-6">
           {/* plan */}
           <Card className="overflow-hidden">
-            <div className="bg-ink-900 p-6 text-white">
+            <div className="relative overflow-hidden bg-gradient-to-br from-coal-700 to-coal-950 p-6 text-white">
+              <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-brand-600/30 blur-2xl" />
               <div className="flex items-center justify-between">
                 <p className="text-xs font-bold uppercase tracking-wider text-ink-300">Current plan</p>
                 <Badge tone="brand" className="bg-brand-500/20 text-brand-200 ring-brand-400/30 capitalize">{plan.name}</Badge>
@@ -197,7 +198,7 @@ export default function SettingsPage() {
       <Modal open={planModal} onClose={() => setPlanModal(false)} title="Change plan">
         <div className="grid gap-3 sm:grid-cols-2">
           {PLANS.filter((p) => p.id !== "free").map((p) => (
-            <div key={p.id} className={cn("rounded-xl p-4 ring-1", p.highlight ? "bg-ink-900 text-white ring-brand-500/40" : "bg-white ring-ink-200")}>
+            <div key={p.id} className={cn("rounded-xl p-4 ring-1", p.highlight ? "bg-gradient-to-br from-coal-700 to-coal-950 text-white ring-brand-400/40" : "glass-chip text-ink-600 ring-white/12")}>
               <p className={cn("font-display text-sm font-bold", p.highlight ? "text-white" : "text-ink-900")}>{p.name}</p>
               <p className={cn("mt-1 font-display text-2xl font-bold", p.highlight ? "text-brand-300" : "text-brand-700")}>
                 {CURRENCY}{p.monthly}<span className={cn("text-xs font-semibold", p.highlight ? "text-ink-400" : "text-ink-400")}>/mo</span>
@@ -214,7 +215,7 @@ export default function SettingsPage() {
             no charge today, no fake payment success.
           </p>
           <div className="mt-3 flex gap-2">
-            <Input value={waitlist} onChange={(e) => setWaitlist(e.target.value)} placeholder="you@email.com" className="bg-white" />
+            <Input value={waitlist} onChange={(e) => setWaitlist(e.target.value)} placeholder="you@email.com" />
             <Button variant="dark" onClick={() => {
               if (!/^[\w.+-]+@[\w-]+\.[\w.]+$/.test(waitlist)) { toast({ title: "Enter a valid email", tone: "warning" }); return; }
               toast({ title: "Added to launch waitlist", desc: "We'll email you the moment payments go live.", tone: "success" });

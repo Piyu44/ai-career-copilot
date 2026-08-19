@@ -111,7 +111,7 @@ export default function ApplicationsPage() {
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {APP_STATUSES.map((s) => (
             <button key={s} onClick={() => setStatusFilter(statusFilter === s ? "all" : s)}
-              className={cn("rounded-xl border p-3 text-left transition-all", statusFilter === s ? "border-brand-400 bg-brand-50 ring-2 ring-brand-100" : "border-ink-100 bg-white hover:border-brand-200")}>
+              className={cn("rounded-xl border p-3 text-left backdrop-blur-sm transition-all", statusFilter === s ? "border-brand-400/60 bg-brand-500/14 shadow-[0_0_20px_rgba(139,92,246,.25)] ring-2 ring-brand-400/20" : "border-white/10 bg-white/[0.04] hover:border-brand-400/30")}>
               <div className="flex items-center gap-2">
                 <span className={cn("h-2 w-2 rounded-full", STATUS_META[s].dot)} />
                 <span className="text-xs font-bold text-ink-500">{s}</span>

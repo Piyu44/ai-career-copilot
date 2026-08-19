@@ -148,7 +148,7 @@ export function ResumeToolsPage() {
             </div>
             <div className="mb-2">
               <input value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} placeholder="Target job title (e.g. Frontend Developer)"
-                className="h-9 w-full rounded-lg bg-white px-3 text-[13px] ring-1 ring-ink-200 placeholder:text-ink-300 focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+                className="h-9 w-full rounded-lg bg-white/[0.06] px-3 text-[13px] text-ink-800 ring-1 ring-white/12 backdrop-blur-sm placeholder:text-ink-300 focus:bg-white/[0.09] focus:ring-2 focus:ring-brand-400/60 focus:outline-none" />
             </div>
             <Textarea rows={6} value={jdText} onChange={(e) => setJdText(e.target.value)} placeholder="Paste the job description to tailor against…" className="text-[12.5px]" />
           </div>

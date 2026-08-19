@@ -131,7 +131,7 @@ export default function CoverLetterPage() {
                   <button key={t.id} onClick={() => setTone(t.id)}
                     className={cn(
                       "rounded-xl border px-3.5 py-2.5 text-left transition-all duration-200",
-                      tone === t.id ? "border-brand-500 bg-brand-50 ring-2 ring-brand-100" : "border-ink-200 bg-white hover:border-brand-300"
+                      tone === t.id ? "border-brand-400/60 bg-brand-500/14 ring-2 ring-brand-400/20 shadow-[0_0_18px_rgba(139,92,246,.22)]" : "border-white/12 bg-white/[0.04] hover:border-brand-400/30"
                     )}>
                     <span className={cn("block text-[13px] font-bold", tone === t.id ? "text-brand-800" : "text-ink-800")}>{t.id}</span>
                     <span className="text-[11px] font-medium text-ink-400">{t.desc}</span>

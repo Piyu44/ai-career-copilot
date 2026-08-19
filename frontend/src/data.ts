@@ -506,12 +506,12 @@ export const APP_STATUSES = ["Saved", "Applied", "Screening", "Interview", "Offe
 export type AppStatus = (typeof APP_STATUSES)[number];
 
 export const STATUS_META: Record<AppStatus, { dot: string; badge: string }> = {
-  Saved: { dot: "bg-ink-400", badge: "bg-ink-100 text-ink-600" },
-  Applied: { dot: "bg-sky-500", badge: "bg-sky-50 text-sky-700 ring-1 ring-sky-200" },
-  Screening: { dot: "bg-amber-500", badge: "bg-amber-50 text-amber-700 ring-1 ring-amber-200" },
-  Interview: { dot: "bg-brand-600", badge: "bg-brand-50 text-brand-700 ring-1 ring-brand-200" },
-  Offer: { dot: "bg-emerald-500", badge: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200" },
-  Rejected: { dot: "bg-rose-500", badge: "bg-rose-50 text-rose-700 ring-1 ring-rose-200" },
+  Saved: { dot: "bg-ink-300", badge: "bg-white/8 text-ink-500 ring-1 ring-white/12" },
+  Applied: { dot: "bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,.7)]", badge: "bg-sky-400/12 text-sky-300 ring-1 ring-sky-400/25" },
+  Screening: { dot: "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,.7)]", badge: "bg-amber-400/12 text-amber-300 ring-1 ring-amber-400/25" },
+  Interview: { dot: "bg-brand-400 shadow-[0_0_8px_rgba(167,139,250,.8)]", badge: "bg-brand-500/14 text-brand-300 ring-1 ring-brand-400/30" },
+  Offer: { dot: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,.7)]", badge: "bg-emerald-400/12 text-emerald-300 ring-1 ring-emerald-400/25" },
+  Rejected: { dot: "bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,.7)]", badge: "bg-rose-400/12 text-rose-300 ring-1 ring-rose-400/25" },
 };
 
 export const daysAgoISO = (d: number) => new Date(Date.now() - d * 86400000).toISOString();

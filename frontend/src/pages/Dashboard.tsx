@@ -127,7 +127,8 @@ export default function Dashboard() {
         {/* right column */}
         <div className="space-y-6">
           <Card className="overflow-hidden">
-            <div className="bg-ink-900 p-5 text-white">
+            <div className="relative overflow-hidden bg-gradient-to-br from-coal-700 to-coal-950 p-5 text-white ring-1 ring-brand-400/20">
+              <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-brand-600/30 blur-2xl" />
               <div className="flex items-center justify-between">
                 <p className="text-xs font-bold uppercase tracking-wider text-ink-300">Credits remaining</p>
                 <Badge tone="brand" className="bg-brand-500/20 text-brand-200 ring-brand-400/30 capitalize">{user?.plan}</Badge>
