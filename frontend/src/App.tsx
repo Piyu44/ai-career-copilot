@@ -1,0 +1,78 @@
+import React, { Suspense, useEffect } from "react";
+import { HashRouter, Route, Routes, useLocation } from "react-router-dom";
+import { AppProviders } from "./context";
+import { GuestOnly, Protected, PublicLayout } from "./components/layout";
+import { Logo } from "./components/ui";
+
+/* Lazy-loaded routes = code splitting per page (perf requirement).
+   Sitemap-ready architecture: every public route below maps 1:1 to a URL. */
+const Landing = React.lazy(() => import("./pages/Landing"));
+const FeaturesPage = React.lazy(() => import("./pages/public").then((m) => ({ default: m.FeaturesPage })));
+const PricingPage = React.lazy(() => import("./pages/public").then((m) => ({ default: m.PricingPage })));
+const LoginPage = React.lazy(() => import("./pages/public").then((m) => ({ default: m.LoginPage })));
+const RegisterPage = React.lazy(() => import("./pages/public").then((m) => ({ default: m.RegisterPage })));
+const ForgotPasswordPage = React.lazy(() => import("./pages/public").then((m) => ({ default: m.ForgotPasswordPage })));
+const ResetPasswordPage = React.lazy(() => import("./pages/public").then((m) => ({ default: m.ResetPasswordPage })));
+const NotFoundPage = React.lazy(() => import("./pages/public").then((m) => ({ default: m.NotFoundPage })));
+
+const Dashboard = React.lazy(() => import("./pages/Dashboard"));
+const JobMatch = React.lazy(() => import("./pages/JobMatch"));
+const ResumeToolsPage = React.lazy(() => import("./pages/ResumeTools").then((m) => ({ default: m.ResumeToolsPage })));
+const AtsCheckerPage = React.lazy(() => import("./pages/ResumeTools").then((m) => ({ default: m.AtsCheckerPage })));
+const CoverLetterPage = React.lazy(() => import("./pages/CoverLetter"));
+const InterviewPage = React.lazy(() => import("./pages/Interview"));
+const ApplicationsPage = React.lazy(() => import("./pages/Applications"));
+const SettingsPage = React.lazy(() => import("./pages/Settings"));
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => window.scrollTo({ top: 0 }), [pathname]);
+  return null;
+}
+
+function PageLoader() {
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="animate-pulse-soft"><Logo /></div>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AppProviders>
+      <HashRouter>
+        <ScrollToTop />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* public marketing */}
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<Landing />} />
+              <Route path="/features" element={<FeaturesPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
+
+            {/* auth (guest only) */}
+            <Route path="/login" element={<GuestOnly><LoginPage /></GuestOnly>} />
+            <Route path="/register" element={<GuestOnly><RegisterPage /></GuestOnly>} />
+            <Route path="/forgot-password" element={<GuestOnly><ForgotPasswordPage /></GuestOnly>} />
+            <Route path="/reset-password" element={<GuestOnly><ResetPasswordPage /></GuestOnly>} />
+
+            {/* authenticated app */}
+            <Route element={<Protected />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/job-match" element={<JobMatch />} />
+              <Route path="/resume-tools" element={<ResumeToolsPage />} />
+              <Route path="/cover-letter" element={<CoverLetterPage />} />
+              <Route path="/interview" element={<InterviewPage />} />
+              <Route path="/ats-checker" element={<AtsCheckerPage />} />
+              <Route path="/applications" element={<ApplicationsPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+            </Route>
+          </Routes>
+        </Suspense>
+      </HashRouter>
+    </AppProviders>
+  );
+}

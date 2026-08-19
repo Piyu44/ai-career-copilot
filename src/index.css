@@ -1,1 +1,150 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Bricolage Grotesque", "Instrument Sans", ui-sans-serif, sans-serif;
+
+  --color-paper: #f5f5fa;
+  --color-card: #ffffff;
+
+  --color-ink-50: #f2f2f9;
+  --color-ink-100: #e7e7f2;
+  --color-ink-200: #cdcfe2;
+  --color-ink-300: #a6a8c6;
+  --color-ink-400: #7b7da3;
+  --color-ink-500: #585a83;
+  --color-ink-600: #414368;
+  --color-ink-700: #2e3052;
+  --color-ink-800: #1f2140;
+  --color-ink-900: #14152e;
+  --color-ink-950: #0b0c1f;
+
+  --color-brand-50: #f5f1fe;
+  --color-brand-100: #ebe3fd;
+  --color-brand-200: #d8c8fa;
+  --color-brand-300: #bfa3f5;
+  --color-brand-400: #a67dee;
+  --color-brand-500: #8b57e3;
+  --color-brand-600: #7437d4;
+  --color-brand-700: #6227bd;
+  --color-brand-800: #51209b;
+  --color-brand-900: #431b7e;
+
+  --shadow-card: 0 1px 2px rgb(20 21 46 / 0.04), 0 10px 28px -18px rgb(20 21 46 / 0.18);
+  --shadow-lift: 0 2px 6px rgb(20 21 46 / 0.05), 0 26px 52px -22px rgb(67 27 126 / 0.3);
+  --shadow-pop: 0 12px 40px -12px rgb(98 39 189 / 0.35);
+
+  --animate-floaty: floaty 7s ease-in-out infinite;
+  --animate-floaty-slow: floaty 10s ease-in-out infinite;
+  --animate-marquee: marquee 36s linear infinite;
+  --animate-fade-up: fade-up 0.65s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-pop-in: pop-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  --animate-pulse-soft: pulse-soft 2.4s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+
+  @keyframes floaty {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pop-in {
+    from { opacity: 0; transform: scale(0.92) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+  @keyframes shimmer {
+    from { background-position: -400px 0; }
+    to { background-position: 400px 0; }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-paper text-ink-900 font-sans antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: var(--color-brand-200);
+    color: var(--color-brand-900);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-ink-200);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .bg-grid-light {
+    background-image:
+      linear-gradient(to right, rgb(20 21 46 / 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(20 21 46 / 0.045) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+  .bg-grid-dark {
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+  .bg-dots-dark {
+    background-image: radial-gradient(rgb(255 255 255 / 0.14) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lift;
+  }
+  .skeleton {
+    @apply rounded-md bg-ink-100;
+    background-image: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.7), transparent);
+    background-size: 400px 100%;
+    background-repeat: no-repeat;
+    animation: shimmer 1.6s linear infinite;
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .reveal.reveal-on {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+}
