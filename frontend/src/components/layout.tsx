@@ -128,6 +128,7 @@ export function Footer() {
           { h: "Product", links: [["Features", "/features"], ["Pricing", "/pricing"], ["Job Match", "/job-match"], ["ATS Checker", "/ats-checker"]] },
           { h: "Tools", links: [["Resume Tools", "/resume-tools"], ["Cover Letter", "/cover-letter"], ["Interview Practice", "/interview"], ["Applications", "/applications"]] },
           { h: "Account", links: [["Log in", "/login"], ["Create account", "/register"], ["Dashboard", "/dashboard"], ["Settings", "/settings"]] },
+          { h: "Legal & Support", links: [["Terms & Conditions", "/terms"], ["Privacy Policy", "/privacy"], ["Refund Policy", "/refund"], ["Contact Us", "/contact"]] },
         ].map((col) => (
           <div key={col.h}>
             <h4 className="font-display text-sm font-bold uppercase tracking-wider text-white">{col.h}</h4>

@@ -14,6 +14,10 @@ const RegisterPage = React.lazy(() => import("./pages/public").then((m) => ({ de
 const ForgotPasswordPage = React.lazy(() => import("./pages/public").then((m) => ({ default: m.ForgotPasswordPage })));
 const ResetPasswordPage = React.lazy(() => import("./pages/public").then((m) => ({ default: m.ResetPasswordPage })));
 const NotFoundPage = React.lazy(() => import("./pages/public").then((m) => ({ default: m.NotFoundPage })));
+const TermsPage = React.lazy(() => import("./pages/legal").then((m) => ({ default: m.TermsPage })));
+const PrivacyPolicyPage = React.lazy(() => import("./pages/legal").then((m) => ({ default: m.PrivacyPolicyPage })));
+const RefundPolicyPage = React.lazy(() => import("./pages/legal").then((m) => ({ default: m.RefundPolicyPage })));
+const ContactUsPage = React.lazy(() => import("./pages/legal").then((m) => ({ default: m.ContactUsPage })));
 
 const Dashboard = React.lazy(() => import("./pages/Dashboard"));
 const JobMatch = React.lazy(() => import("./pages/JobMatch"));
@@ -52,6 +56,10 @@ export default function App() {
               <Route path="/" element={<Landing />} />
               <Route path="/features" element={<FeaturesPage />} />
               <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
+              <Route path="/refund" element={<RefundPolicyPage />} />
+              <Route path="/contact" element={<ContactUsPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>
 
