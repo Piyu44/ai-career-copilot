@@ -1,0 +1,62 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        // Only the authenticated user can read or write their own profile
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        
+        // Data validation for user fields
+        ".validate": "newData.hasChildren(['email'])",
+        
+        "email": {
+          ".validate": "newData.isString() && newData.val().length <= 100"
+        },
+        "name": {
+          ".validate": "newData.isString() && newData.val().length <= 100"
+        },
+        "credits": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "plan": {
+          ".validate": "newData.val() == 'free' || newData.val() == 'starter' || newData.val() == 'pro'"
+        },
+        
+        "transactions": {
+          "$txId": {
+            // User can only write transactions for themselves
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": "auth != null && auth.uid === $uid",
+            ".validate": "newData.hasChildren(['id', 'amount', 'planId'])"
+          }
+        },
+        
+        "resumes": {
+          "$resumeId": {
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        },
+        
+        "applications": {
+          "$appId": {
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        },
+        
+        "analyses": {
+          "$analysisId": {
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        }
+      }
+    },
+    // Deny access to any other root paths by default
+    "$other": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}

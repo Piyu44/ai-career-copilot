@@ -36,7 +36,9 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", h);
   }, []);
 
-  useEffect(() => setOpen(false), [location]);
+  useEffect(() => {
+    setOpen(false);
+  }, [location]);
 
   const goHash = (hash: string) => {
     setOpen(false);
@@ -360,13 +362,61 @@ function AvatarMenu() {
   );
 }
 
+function EmailVerificationBanner() {
+  const { user, sendVerificationEmail, checkEmailVerified } = useAuth();
+  const [sending, setSending] = useState(false);
+  const [checking, setChecking] = useState(false);
+
+  if (!user || user.emailVerified) return null;
+
+  return (
+    <div className="border-b border-amber-500/25 bg-amber-500/10 px-4 py-2.5 backdrop-blur-md">
+      <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
+        <div className="flex items-center gap-2 text-amber-200">
+          <Mail className="h-4 w-4 shrink-0 text-amber-400" />
+          <span>
+            Please verify your email (<strong>{user.email}</strong>) to secure your account.
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={async () => {
+              setSending(true);
+              await sendVerificationEmail();
+              setSending(false);
+            }}
+            disabled={sending}
+            className="font-bold text-amber-300 underline underline-offset-2 hover:text-amber-200 disabled:opacity-50"
+          >
+            {sending ? "Sending..." : "Resend Link"}
+          </button>
+          <span className="text-amber-500/60">•</span>
+          <button
+            onClick={async () => {
+              setChecking(true);
+              await checkEmailVerified();
+              setChecking(false);
+            }}
+            disabled={checking}
+            className="rounded bg-amber-400/20 px-2.5 py-1 font-bold text-amber-200 ring-1 ring-amber-400/30 transition hover:bg-amber-400/30 disabled:opacity-50"
+          >
+            {checking ? "Checking..." : "I've Verified ✓"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function AppLayout() {
   const { user } = useAuth();
   const [drawer, setDrawer] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   useBodyLock(drawer);
-  useEffect(() => setDrawer(false), [location.pathname]);
+  useEffect(() => {
+    setDrawer(false);
+  }, [location.pathname]);
   if (!user) return null;
 
   const bottomNav = NAV_ITEMS.slice(0, 4).concat(NAV_ITEMS[7]);
@@ -439,6 +489,7 @@ export function AppLayout() {
             </div>
           </div>
         </header>
+        <EmailVerificationBanner />
         <main className="mx-auto w-full max-w-[1180px] px-4 pb-28 pt-7 sm:px-6 lg:px-8 lg:pb-12">
           <Outlet />
         </main>

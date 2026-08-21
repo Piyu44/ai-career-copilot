@@ -1,5 +1,32 @@
+# Dependencies & Build
 node_modules/
 .next/
 dist/
 build/
 *.log
+
+# ─── ALL .env Files in any directory (Root, Frontend, Backend, etc.) ─────────
+.env
+.env.*
+*.env
+**/.env
+**/.env.*
+**/*.env
+# Allow example templates to be committed
+!.env.example
+!**/.env.example
+
+# ─── Private Keys & Credentials ──────────────────────────────────────────────
+*.pem
+*.key
+serviceAccountKey.json
+firebase-adminsdk*.json
+credentials.json
+**/*serviceAccountKey*.json
+**/*firebase-adminsdk*.json
+
+# ─── OS & IDE ────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

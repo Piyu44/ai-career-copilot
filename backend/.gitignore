@@ -1,4 +1,16 @@
 node_modules/
-.env
 uploads/
 *.log
+
+# All .env variations
+.env
+.env.*
+*.env
+!.env.example
+
+# Credentials & keys
+*.pem
+*.key
+serviceAccountKey.json
+firebase-adminsdk*.json
+credentials.json

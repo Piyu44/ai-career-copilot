@@ -4,6 +4,7 @@ import {
   Server, User as UserIcon, Zap,
 } from "lucide-react";
 import { Badge, Button, Card, Confirm, Field, Input, Modal, PageHeader, Toggle } from "../components/ui";
+import { RazorpayModal } from "../components/RazorpayModal";
 import { useAuth, useData, useToast } from "../context";
 import { usePageMeta } from "../hooks";
 import { CURRENCY, PLANS, CREDIT_COSTS, ACTION_LABELS } from "../data";
@@ -13,7 +14,7 @@ import { cn, formatDate, timeAgo } from "../utils";
 
 export default function SettingsPage() {
   usePageMeta("Settings — AI Career Copilot");
-  const { user, updateUser, usage, logout } = useAuth();
+  const { user, updateUser, usage, logout, sendVerificationEmail, checkEmailVerified } = useAuth();
   const { resetAll } = useData();
   const { toast } = useToast();
 
@@ -21,6 +22,8 @@ export default function SettingsPage() {
   const [email, setEmail] = useState(user?.email ?? "");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [savingProfile, setSavingProfile] = useState(false);
+  const [sendingVerif, setSendingVerif] = useState(false);
+  const [checkingVerif, setCheckingVerif] = useState(false);
   const [planModal, setPlanModal] = useState(false);
   const [waitlist, setWaitlist] = useState("");
   const [confirmReset, setConfirmReset] = useState(false);
@@ -71,6 +74,48 @@ export default function SettingsPage() {
                 <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               </Field>
             </div>
+            
+            {/* email verification status */}
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white/5 p-3.5 ring-1 ring-white/10">
+              <div className="flex items-center gap-2.5">
+                <Mail className="h-4 w-4 text-brand-300" />
+                <span className="text-xs sm:text-sm font-semibold text-ink-700">Email Status:</span>
+                {user?.emailVerified ? (
+                  <Badge tone="success">Verified ✓</Badge>
+                ) : (
+                  <Badge tone="warning">Unverified</Badge>
+                )}
+              </div>
+              {!user?.emailVerified && (
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    loading={sendingVerif}
+                    onClick={async () => {
+                      setSendingVerif(true);
+                      await sendVerificationEmail();
+                      setSendingVerif(false);
+                    }}
+                  >
+                    Send Link
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    loading={checkingVerif}
+                    onClick={async () => {
+                      setCheckingVerif(true);
+                      await checkEmailVerified();
+                      setCheckingVerif(false);
+                    }}
+                  >
+                    Check Status
+                  </Button>
+                </div>
+              )}
+            </div>
+
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
               <p className="text-xs font-medium text-ink-400">Member since {user ? formatDate(user.createdAt) : "—"}</p>
               <Button onClick={saveProfile} loading={savingProfile} icon={<Save className="h-4 w-4" />}>Save changes</Button>
@@ -168,11 +213,11 @@ export default function SettingsPage() {
               </div>
               <div className="flex items-center justify-between rounded-lg bg-ink-50/70 px-3.5 py-2.5">
                 <span className="text-ink-600">Payments</span>
-                <Badge tone="ink">Gateway-ready · not charged in demo</Badge>
+                <Badge tone="emerald">Razorpay Gateway · Active</Badge>
               </div>
             </div>
             <p className="mt-3 text-xs leading-relaxed text-ink-400">
-              VITE_USE_MOCK_AI=false routes AI calls to the backend service, which reads AI_API_KEY server-side. Keys never ship to the browser.
+              Payments are processed via Razorpay (UPI, Debit/Credit cards, NetBanking). Live and Test transactions update plan entitlements in real-time.
             </p>
           </Card>
 
@@ -194,36 +239,12 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* plan modal */}
-      <Modal open={planModal} onClose={() => setPlanModal(false)} title="Change plan">
-        <div className="grid gap-3 sm:grid-cols-2">
-          {PLANS.filter((p) => p.id !== "free").map((p) => (
-            <div key={p.id} className={cn("rounded-xl p-4 ring-1", p.highlight ? "bg-gradient-to-br from-coal-700 to-coal-950 text-white ring-brand-400/40" : "glass-chip text-ink-600 ring-white/12")}>
-              <p className={cn("font-display text-sm font-bold", p.highlight ? "text-white" : "text-ink-900")}>{p.name}</p>
-              <p className={cn("mt-1 font-display text-2xl font-bold", p.highlight ? "text-brand-300" : "text-brand-700")}>
-                {CURRENCY}{p.monthly}<span className={cn("text-xs font-semibold", p.highlight ? "text-ink-400" : "text-ink-400")}>/mo</span>
-              </p>
-              <p className={cn("mt-1 text-xs font-semibold", p.highlight ? "text-ink-300" : "text-ink-500")}>{p.credits} credits / month</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 rounded-xl bg-amber-50 p-4 ring-1 ring-amber-200">
-          <p className="text-[13px] font-bold text-amber-800">Payments aren't live in this build</p>
-          <p className="mt-1 text-xs leading-relaxed text-amber-800/80">
-            The checkout will run through an Indian payment gateway (UPI, cards, netbanking) with plan
-            entitlements applied via webhooks. Leave your email and we'll flip the switch for you at launch —
-            no charge today, no fake payment success.
-          </p>
-          <div className="mt-3 flex gap-2">
-            <Input value={waitlist} onChange={(e) => setWaitlist(e.target.value)} placeholder="you@email.com" />
-            <Button variant="dark" onClick={() => {
-              if (!/^[\w.+-]+@[\w-]+\.[\w.]+$/.test(waitlist)) { toast({ title: "Enter a valid email", tone: "warning" }); return; }
-              toast({ title: "Added to launch waitlist", desc: "We'll email you the moment payments go live.", tone: "success" });
-              setPlanModal(false);
-            }}>Notify me</Button>
-          </div>
-        </div>
-      </Modal>
+      {/* Razorpay plan checkout modal */}
+      <RazorpayModal
+        open={planModal}
+        onClose={() => setPlanModal(false)}
+        selectedPlanId={user?.plan === "starter" ? "pro" : "starter"}
+      />
 
       <Confirm
         open={confirmReset}

@@ -41,6 +41,22 @@ export const timeAgo = (iso: string) => {
 export const countWords = (text: string) =>
   text.trim() ? text.trim().split(/\s+/).length : 0;
 
+/** Sanitize input strings to prevent XSS injection */
+export function sanitizeHtml(str: string): string {
+  if (!str || typeof str !== "string") return "";
+  return str
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, "")
+    .replace(/javascript:/gi, "")
+    .replace(/data:text\/html/gi, "");
+}
+
+/** Sanitize and cap length for safe text processing */
+export function sanitizeInput(input: string, maxLen = 15000): string {
+  if (!input || typeof input !== "string") return "";
+  return sanitizeHtml(input.slice(0, maxLen)).trim();
+}
+
 export async function copyText(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);
@@ -104,13 +120,15 @@ export function downloadFile(filename: string, content: string, mime = "text/pla
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-/** Word-compatible .doc download (HTML payload opens cleanly in MS Word) */
+/** Word-compatible .doc download (HTML payload opens cleanly in MS Word) with XSS sanitization */
 export function downloadDocx(filename: string, title: string, htmlBody: string) {
+  const safeTitle = sanitizeHtml(title);
+  const safeBody = sanitizeHtml(htmlBody);
   const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
-<head><meta charset="utf-8"><title>${title}</title>
+<head><meta charset="utf-8"><title>${safeTitle}</title>
 <style>body{font-family:Calibri,Arial,sans-serif;color:#14152e;line-height:1.55;font-size:11.5pt}
 h1{font-size:17pt;margin:0 0 4pt}h2{font-size:12.5pt;color:#6227bd;border-bottom:1px solid #d8c8fa;padding-bottom:2pt;margin:14pt 0 6pt;text-transform:uppercase;letter-spacing:.4pt}
-p{margin:4pt 0}ul{margin:4pt 0 8pt 16pt}</style></head><body>${htmlBody}</body></html>`;
+p{margin:4pt 0}ul{margin:4pt 0 8pt 16pt}</style></head><body>${safeBody}</body></html>`;
   downloadFile(filename.endsWith(".doc") ? filename : `${filename}.doc`, html, "application/msword");
 }
 

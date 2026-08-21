@@ -19,6 +19,7 @@ import {
   logout as apiLogout,
   registerUser,
   updateUser as apiUpdateUser,
+  DEMO_ACCOUNT,
   type PublicUser,
   type StoredResume,
   type UsageRecord,
@@ -84,15 +85,61 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { onAuthStateChanged } from "firebase/auth";
+import { ref, set, update } from "firebase/database";
+import { auth, database } from "./services/firebase";
+import {
+  firebaseLogin,
+  firebaseRegister,
+  firebaseLogout,
+  firebaseForgotPassword,
+  firebaseSendEmailVerification,
+  firebaseReloadUser,
+} from "./services/firebaseAuth";
+import { PLANS, type PlanId } from "./data";
+
 /* ---------------------------------- auth ---------------------------------- */
+
+export function formatFirebaseError(msg: string): string {
+  if (!msg) return "An unexpected error occurred.";
+  if (msg.includes("auth/email-already-in-use")) {
+    return "An account with this email already exists.";
+  }
+  if (msg.includes("auth/invalid-email")) {
+    return "Please enter a valid email address.";
+  }
+  if (msg.includes("auth/weak-password")) {
+    return "Password is too weak. Please use at least 6 characters.";
+  }
+  if (
+    msg.includes("auth/user-not-found") ||
+    msg.includes("auth/wrong-password") ||
+    msg.includes("auth/invalid-credential")
+  ) {
+    return "Invalid email or password.";
+  }
+  if (
+    msg.includes("auth/operation-not-allowed") ||
+    msg.includes("CONFIGURATION_NOT_FOUND")
+  ) {
+    return "Email/Password sign-in is not enabled in your Firebase Console. Please go to Authentication → Sign-in method and enable Email/Password.";
+  }
+  if (msg.includes("auth/too-many-requests")) {
+    return "Too many failed attempts. Please try again in a few minutes.";
+  }
+  return msg.replace("Firebase: ", "").replace(/\s*\(auth\/[^)]+\)\.?/g, "");
+}
 
 interface AuthCtxType {
   user: PublicUser | null;
   initializing: boolean;
-  login: (email: string, pw: string) => PublicUser;
-  register: (name: string, email: string, pw: string) => PublicUser;
-  logout: () => void;
+  login: (email: string, pw: string) => Promise<PublicUser>;
+  register: (name: string, email: string, pw: string) => Promise<PublicUser>;
+  logout: () => Promise<void>;
   updateUser: (patch: Partial<PublicUser>) => void;
+  sendVerificationEmail: () => Promise<{ error: string | null }>;
+  checkEmailVerified: () => Promise<boolean>;
+  upgradePlan: (planId: PlanId, billing: "monthly" | "yearly", paymentId: string) => Promise<PublicUser>;
   /** Gate an AI action behind the credit system. Returns false when blocked. */
   spendCredits: (action: CreditAction) => boolean;
   usage: UsageRecord[];
@@ -109,29 +156,194 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [usage, setUsage] = useState<UsageRecord[]>([]);
 
   useEffect(() => {
-    setUser(getSessionUser());
-    setInitializing(false);
+    // Listen for Firebase Auth state changes
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        const u: PublicUser = {
+          id: firebaseUser.uid,
+          name: firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "User",
+          email: firebaseUser.email || "",
+          plan: "free",
+          credits: 10,
+          createdAt: firebaseUser.metadata.creationTime || new Date().toISOString(),
+          emailVerified: firebaseUser.emailVerified,
+        };
+        setUser(u);
+      } else {
+        // Fallback to local session if present (for demo accounts)
+        const sessionUser = getSessionUser();
+        setUser(sessionUser);
+      }
+      setInitializing(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const login = (email: string, pw: string) => {
-    const u = loginUser(email, pw);
+  const login = async (email: string, pw: string): Promise<PublicUser> => {
+    // Handle demo live account button
+    if (email.toLowerCase() === DEMO_ACCOUNT.email.toLowerCase() && pw === DEMO_ACCOUNT.password) {
+      try {
+        const res = await firebaseLogin(email, pw);
+        if (res.user) {
+          const u: PublicUser = {
+            id: res.user.uid,
+            name: res.user.displayName || "Demo User",
+            email: res.user.email || email,
+            plan: "free",
+            credits: 10,
+            createdAt: res.user.metadata.creationTime || new Date().toISOString(),
+            emailVerified: res.user.emailVerified,
+          };
+          setUser(u);
+          return u;
+        }
+      } catch {
+        // Fallback for pre-seeded offline demo account
+      }
+      const u = loginUser(email, pw);
+      setUser(u);
+      return u;
+    }
+
+    const res = await firebaseLogin(email, pw);
+    if (res.error || !res.user) {
+      throw new Error(formatFirebaseError(res.error || "Login failed"));
+    }
+
+    const u: PublicUser = {
+      id: res.user.uid,
+      name: res.user.displayName || res.user.email?.split("@")[0] || "User",
+      email: res.user.email || email,
+      plan: "free",
+      credits: 10,
+      createdAt: res.user.metadata.creationTime || new Date().toISOString(),
+      emailVerified: res.user.emailVerified,
+    };
     setUser(u);
     return u;
   };
-  const register = (name: string, email: string, pw: string) => {
-    const u = registerUser(name, email, pw);
+
+  const register = async (name: string, email: string, pw: string): Promise<PublicUser> => {
+    const res = await firebaseRegister(name, email, pw);
+    if (res.error || !res.user) {
+      throw new Error(formatFirebaseError(res.error || "Registration failed"));
+    }
+
+    const u: PublicUser = {
+      id: res.user.uid,
+      name: name.trim() || res.user.displayName || "User",
+      email: res.user.email || email,
+      plan: "free",
+      credits: 10,
+      createdAt: res.user.metadata.creationTime || new Date().toISOString(),
+      emailVerified: res.user.emailVerified,
+    };
     setUser(u);
     return u;
   };
-  const logout = () => {
+
+  const logout = async () => {
+    await firebaseLogout();
     apiLogout();
     setUser(null);
     toast({ title: "Logged out", desc: "See you at the next interview!", tone: "info" });
   };
+
+  const sendVerificationEmail = async () => {
+    if (!auth.currentUser) return { error: "No user signed in" };
+    const res = await firebaseSendEmailVerification(auth.currentUser);
+    if (res.error) {
+      toast({ title: "Failed to send", desc: formatFirebaseError(res.error), tone: "error" });
+    } else {
+      toast({
+        title: "Verification email sent",
+        desc: `Check your inbox at ${auth.currentUser.email} for the verification link.`,
+        tone: "success",
+      });
+    }
+    return res;
+  };
+
+  const checkEmailVerified = async (): Promise<boolean> => {
+    const refreshedUser = await firebaseReloadUser();
+    if (!refreshedUser) return false;
+    const isVerified = refreshedUser.emailVerified;
+    if (user) {
+      setUser({ ...user, emailVerified: isVerified });
+    }
+    if (isVerified) {
+      toast({ title: "Email verified!", desc: "Your email has been confirmed successfully.", tone: "success" });
+    } else {
+      toast({ title: "Not verified yet", desc: "Please click the link sent to your email.", tone: "warning" });
+    }
+    return isVerified;
+  };
+
+  const upgradePlan = async (planId: PlanId, billing: "monthly" | "yearly", paymentId: string): Promise<PublicUser> => {
+    const selectedPlan = PLANS.find((p) => p.id === planId) || PLANS[0];
+    const newCredits = (user?.credits || 0) + selectedPlan.credits;
+
+    const baseUser = user || {
+      id: auth.currentUser?.uid || "guest",
+      name: "User",
+      email: "user@example.com",
+      createdAt: new Date().toISOString(),
+      emailVerified: false,
+    };
+
+    const updatedUser: PublicUser = {
+      ...baseUser,
+      plan: planId,
+      credits: newCredits,
+    };
+    setUser(updatedUser);
+
+    // Save to Firebase Realtime Database
+    try {
+      if (auth.currentUser) {
+        await update(ref(database, `users/${auth.currentUser.uid}`), {
+          plan: planId,
+          credits: newCredits,
+          updatedAt: new Date().toISOString(),
+        });
+
+        // Save transaction record
+        await set(ref(database, `users/${auth.currentUser.uid}/transactions/${paymentId}`), {
+          id: paymentId,
+          planId,
+          planName: selectedPlan.name,
+          amount: billing === "monthly" ? selectedPlan.monthly : selectedPlan.yearly,
+          billing,
+          currency: "INR",
+          createdAt: new Date().toISOString(),
+          status: "success",
+        });
+      }
+    } catch (dbErr) {
+      console.warn("Could not save plan upgrade to Realtime Database:", dbErr);
+    }
+
+    try {
+      apiUpdateUser({ plan: planId, credits: newCredits });
+    } catch {
+      // Local backup
+    }
+
+    toast({
+      title: `Upgraded to ${selectedPlan.name} Plan! 🎉`,
+      desc: `${selectedPlan.credits} credits added to your balance. Payment ID: ${paymentId}`,
+      tone: "success",
+    });
+
+    return updatedUser;
+  };
+
   const updateUser = (patch: Partial<PublicUser>) => {
     const u = apiUpdateUser(patch);
     if (u) setUser(u);
   };
+
   const refreshUsage = useCallback(() => {
     setUsage(getUsage());
   }, []);
@@ -162,7 +374,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const value = useMemo(
-    () => ({ user, initializing, login, register, logout, updateUser, spendCredits, usage, refreshUsage }),
+    () => ({
+      user,
+      initializing,
+      login,
+      register,
+      logout,
+      updateUser,
+      sendVerificationEmail,
+      checkEmailVerified,
+      upgradePlan,
+      spendCredits,
+      usage,
+      refreshUsage,
+    }),
     [user, initializing, usage]
   );
 

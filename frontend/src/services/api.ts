@@ -70,6 +70,7 @@ export interface StoredUser {
   plan: PlanId;
   credits: number;
   createdAt: string;
+  emailVerified?: boolean;
 }
 
 /** Demo-grade hash so plaintext never persists. Production: bcrypt in backend. */
@@ -82,6 +83,7 @@ export const sanitizeUser = (u: StoredUser) => ({
   plan: u.plan,
   credits: u.credits,
   createdAt: u.createdAt,
+  emailVerified: u.emailVerified ?? false,
 });
 export type PublicUser = ReturnType<typeof sanitizeUser>;
 

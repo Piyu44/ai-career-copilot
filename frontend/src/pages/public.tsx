@@ -6,10 +6,11 @@ import {
 } from "lucide-react";
 import { Badge, Button, Card, Cube, Field, Input, Logo, Orb, SceneShapes, TiltCard } from "../components/ui";
 import { FaqSection, PricingCards, SectionHead } from "../components/sections";
-import { useAuth, useToast } from "../context";
+import { useAuth, useToast, formatFirebaseError } from "../context";
 import { usePageMeta } from "../hooks";
 import { ACTION_LABELS, CREDIT_COSTS } from "../data";
 import { DEMO_ACCOUNT } from "../services/api";
+import { firebaseForgotPassword } from "../services/firebaseAuth";
 import { cn } from "../utils";
 
 /* ================================ FEATURES ================================ */
@@ -291,7 +292,7 @@ export function LoginPage() {
   const [errors, setErrors] = useState<{ email?: string; pw?: string; form?: string }>({});
   const [loading, setLoading] = useState(false);
 
-  const submit = (e?: React.FormEvent, em = email, p = pw) => {
+  const submit = async (e?: React.FormEvent, em = email, p = pw) => {
     e?.preventDefault();
     const errs: typeof errors = {};
     if (!EMAIL_RE.test(em)) errs.email = "Enter a valid email address";
@@ -299,16 +300,15 @@ export function LoginPage() {
     setErrors(errs);
     if (Object.keys(errs).length) return;
     setLoading(true);
-    setTimeout(() => {
-      try {
-        const u = login(em, p);
-        toast({ title: `Welcome back, ${u.name.split(" ")[0]}!`, desc: "Your copilot is warmed up.", tone: "success" });
-        nav("/dashboard");
-      } catch (err: any) {
-        setErrors({ form: err.message });
-        setLoading(false);
-      }
-    }, 500);
+    try {
+      const u = await login(em, p);
+      toast({ title: `Welcome back, ${u.name.split(" ")[0]}!`, desc: "Your copilot is warmed up.", tone: "success" });
+      nav("/dashboard");
+    } catch (err: any) {
+      setErrors({ form: err.message });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -355,7 +355,7 @@ export function RegisterPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs: Record<string, string> = {};
     if (form.name.trim().length < 2) errs.name = "Enter your full name";
@@ -366,16 +366,15 @@ export function RegisterPage() {
     setErrors(errs);
     if (Object.keys(errs).length) return;
     setLoading(true);
-    setTimeout(() => {
-      try {
-        const u = register(form.name, form.email, form.pw);
-        toast({ title: `Account created — welcome, ${u.name.split(" ")[0]}!`, desc: "10 free credits added. Start with a job match.", tone: "success" });
-        nav("/dashboard");
-      } catch (err: any) {
-        setErrors({ form: err.message });
-        setLoading(false);
-      }
-    }, 600);
+    try {
+      const u = await register(form.name, form.email, form.pw);
+      toast({ title: `Account created — welcome, ${u.name.split(" ")[0]}!`, desc: "10 free credits added. Start with a job match.", tone: "success" });
+      nav("/dashboard");
+    } catch (err: any) {
+      setErrors({ form: err.message });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -419,19 +418,40 @@ export function ForgotPasswordPage() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleSendReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!EMAIL_RE.test(email)) return setError("Enter a valid email");
+    setError("");
+    setLoading(true);
+    try {
+      const res = await firebaseForgotPassword(email);
+      if (res.error) {
+        setError(formatFirebaseError(res.error));
+      } else {
+        setSent(true);
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to send reset email");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AuthShell title="Forgot your password?" sub="We'll email you a secure reset link.">
       {sent ? (
         <div className={successPanel}>
           <Mail className="mx-auto h-8 w-8 text-emerald-300" />
           <p className="mt-3 font-display text-lg font-bold text-emerald-200">Check your inbox</p>
-          <p className="mt-1 text-sm text-emerald-300/80">If {email} has an account, a reset link is on its way. (Demo mode: email service connects at launch.)</p>
-          <Link to="/reset-password" className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-emerald-300 hover:text-emerald-200">
-            I have my reset token <ArrowRight className="h-4 w-4" />
+          <p className="mt-1 text-sm text-emerald-300/80">If {email} has an account, a reset link has been sent by Firebase.</p>
+          <Link to="/login" className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-emerald-300 hover:text-emerald-200">
+            Back to login <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       ) : (
-        <form onSubmit={(e) => { e.preventDefault(); if (!EMAIL_RE.test(email)) return setError("Enter a valid email"); setError(""); setLoading(true); setTimeout(() => { setLoading(false); setSent(true); }, 700); }} className="space-y-4" noValidate>
+        <form onSubmit={handleSendReset} className="space-y-4" noValidate>
+          {error && <div className={formError}>{error}</div>}
           <Field label="Email" error={error}>
             <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@college.edu" />
           </Field>

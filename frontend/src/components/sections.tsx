@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check, ChevronDown, Sparkles } from "lucide-react";
-import { CURRENCY, FAQS, PLANS } from "../data";
+import { CURRENCY, FAQS, PLANS, type PlanId } from "../data";
 import { Badge, Button, buttonCls, Cube, Modal, Orb, Ring3D } from "./ui";
 import { cn } from "../utils";
 import { useAuth } from "../context";
@@ -30,64 +30,99 @@ export const SectionHead = ({
   </div>
 );
 
+import { RazorpayModal } from "./RazorpayModal";
+
 /* --------------------------------- pricing -------------------------------- */
 
 export function PricingCards({ billing = "monthly" }: { billing?: "monthly" | "yearly" }) {
   const { user } = useAuth();
-  const ctaTo = user ? "/settings" : "/register";
+  const [checkoutPlanId, setCheckoutPlanId] = useState<PlanId | null>(null);
+
   return (
-    <div className="grid gap-5 md:grid-cols-3">
-      {PLANS.map((plan) => {
-        const price = billing === "monthly" ? plan.monthly : plan.yearly;
-        const hot = !!plan.highlight;
-        return (
-          <div
-            key={plan.id}
-            className={cn(
-              "relative flex flex-col rounded-2xl p-7 transition-all duration-300",
-              hot
-                ? "glass-deep ring-2 ring-brand-400/45 shadow-[0_36px_80px_-30px_rgba(109,40,217,.65),0_0_50px_-12px_rgba(139,92,246,.4)] md:-translate-y-3"
-                : "glass card-hover"
-            )}
-          >
-            {hot && (
-              <>
-                <div className="pointer-events-none absolute -top-16 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-brand-600/35 blur-3xl" />
-                <Badge tone="brand" className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-b from-brand-500 to-brand-700 text-white ring-brand-400/50 shadow-pop">
-                  Most popular
-                </Badge>
-              </>
-            )}
-            <h3 className={cn("font-display text-lg font-bold", hot ? "text-white" : "text-ink-800")}>{plan.name}</h3>
-            <p className="mt-1 text-[13px] text-ink-400">{plan.tagline}</p>
-            <p className="mt-5 flex items-baseline gap-1.5">
-              <span className={cn("font-display text-[42px] font-bold leading-none", hot ? "text-white text-glow" : "text-white")}>
-                {CURRENCY}{price}
-              </span>
-              <span className="text-sm font-medium text-ink-400">/{billing === "monthly" ? "month" : "year"}</span>
-            </p>
-            <p className={cn("mt-1.5 text-xs font-semibold", hot ? "text-brand-300" : "text-brand-400")}>
-              {plan.credits} credits {plan.id === "free" ? "one-time" : "every month"}
-            </p>
-            <ul className="mt-6 flex-1 space-y-3">
-              {plan.features.map((f) => (
-                <li key={f} className="flex items-start gap-2.5 text-sm text-ink-500">
-                  <span className={cn("mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full", hot ? "bg-brand-500/25 text-brand-300" : "bg-emerald-400/14 text-emerald-300")}>
-                    <Check className="h-3 w-3" strokeWidth={3} />
+    <>
+      <div className="grid gap-5 md:grid-cols-3">
+        {PLANS.map((plan) => {
+          const price = billing === "monthly" ? plan.monthly : plan.yearly;
+          const hot = !!plan.highlight;
+          const isCurrent = user && user.plan === plan.id;
+
+          return (
+            <div
+              key={plan.id}
+              className={cn(
+                "relative flex flex-col rounded-2xl p-7 transition-all duration-300",
+                hot
+                  ? "glass-deep ring-2 ring-brand-400/45 shadow-[0_36px_80px_-30px_rgba(109,40,217,.65),0_0_50px_-12px_rgba(139,92,246,.4)] md:-translate-y-3"
+                  : "glass card-hover"
+              )}
+            >
+              {hot && (
+                <>
+                  <div className="pointer-events-none absolute -top-16 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-brand-600/35 blur-3xl" />
+                  <Badge tone="brand" className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-b from-brand-500 to-brand-700 text-white ring-brand-400/50 shadow-pop">
+                    Most popular
+                  </Badge>
+                </>
+              )}
+              <h3 className={cn("font-display text-lg font-bold", hot ? "text-white" : "text-ink-800")}>{plan.name}</h3>
+              <p className="mt-1 text-[13px] text-ink-400">{plan.tagline}</p>
+              <p className="mt-5 flex items-baseline gap-1.5">
+                <span className={cn("font-display text-[42px] font-bold leading-none", hot ? "text-white text-glow" : "text-white")}>
+                  {CURRENCY}{price}
+                </span>
+                <span className="text-sm font-medium text-ink-400">/{billing === "monthly" ? "month" : "year"}</span>
+              </p>
+              <p className={cn("mt-1.5 text-xs font-semibold", hot ? "text-brand-300" : "text-brand-400")}>
+                {plan.credits} credits {plan.id === "free" ? "one-time" : "every month"}
+              </p>
+              <ul className="mt-6 flex-1 space-y-3">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-ink-500">
+                    <span className={cn("mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full", hot ? "bg-brand-500/25 text-brand-300" : "bg-emerald-400/14 text-emerald-300")}>
+                      <Check className="h-3 w-3" strokeWidth={3} />
+                    </span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              
+              {user ? (
+                <button
+                  onClick={() => {
+                    if (plan.id !== "free" && !isCurrent) {
+                      setCheckoutPlanId(plan.id);
+                    }
+                  }}
+                  disabled={isCurrent || plan.id === "free"}
+                  className={cn(
+                    "mt-7 w-full",
+                    buttonCls(hot ? "primary" : "secondary", "lg", "w-full"),
+                    isCurrent && "opacity-60 cursor-default"
+                  )}
+                >
+                  {isCurrent ? "Current Plan ✓" : plan.cta}
+                </button>
+              ) : (
+                <Link to="/register" className="mt-7">
+                  <span className={buttonCls(hot ? "primary" : "secondary", "lg", "w-full")}>
+                    {plan.cta}
                   </span>
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Link to={ctaTo} className="mt-7">
-              <span className={buttonCls(hot ? "primary" : "secondary", "lg", "w-full")}>
-                {user && user.plan === plan.id ? "Current plan" : plan.cta}
-              </span>
-            </Link>
-          </div>
-        );
-      })}
-    </div>
+                </Link>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {checkoutPlanId && (
+        <RazorpayModal
+          open={!!checkoutPlanId}
+          onClose={() => setCheckoutPlanId(null)}
+          selectedPlanId={checkoutPlanId}
+          defaultBilling={billing}
+        />
+      )}
+    </>
   );
 }
 
