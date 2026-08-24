@@ -27,7 +27,7 @@ export const PLANS: Plan[] = [
     monthly: 0,
     yearly: 0,
     credits: 10,
-    tagline: "Try the copilot",
+    tagline: "Try CareerDost free",
     features: ["3 job analyses", "Basic suggestions", "Limited exports", "Community support"],
     cta: "Start Free",
   },
@@ -476,7 +476,7 @@ export const INTERVIEW_BANK: BankQuestion[] = [
 export const FAQS = [
   {
     q: "Is the match score the same as what an employer's ATS gives?",
-    a: "No — and we say this clearly inside the product. Your match score is AI Career Copilot's internal assessment of how well your resume covers a job description. Real employer ATS setups vary widely; our score tells you what to fix, not what a company will score you.",
+    a: "No — and we say this clearly inside the product. Your match score is CareerDost's internal assessment of how well your resume covers a job description. Real employer ATS setups vary widely; our score tells you what to fix, not what a company will score you.",
   },
   {
     q: "Does the AI invent experience or skills I don't have?",

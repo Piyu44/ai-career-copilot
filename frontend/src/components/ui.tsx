@@ -622,7 +622,8 @@ export const Logo = ({ light = true, small = false }: { light?: boolean; small?:
       </svg>
     </span>
     <span className={cn("font-display font-bold leading-tight", small ? "text-[15px]" : "text-[17px]", "text-white")}>
-      AI Career <span className="text-brand-300">Copilot</span>
+      Career<span className="text-brand-300">Dost</span>
+      <span className="ml-1.5 rounded-md bg-brand-500/20 px-1.5 py-0.5 text-[10px] font-bold text-brand-300 ring-1 ring-brand-400/30">AI</span>
     </span>
   </span>
 );

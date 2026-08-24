@@ -14,7 +14,7 @@ import { CREDIT_COSTS } from "../data";
 const scoreTone = (s: number) => (s >= 75 ? "emerald" : s >= 60 ? "amber" : "rose") as "emerald" | "amber" | "rose";
 
 export default function Dashboard() {
-  usePageMeta("Dashboard — AI Career Copilot");
+  usePageMeta("Dashboard — CareerDost AI");
   const { user } = useAuth();
   const { analyses, applications, loading } = useData();
   const nav = useNavigate();

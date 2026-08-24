@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect } from "react";
-import { HashRouter, Route, Routes, useLocation } from "react-router-dom";
-import { AppProviders } from "./context";
+import { HashRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { AppProviders, useAuth } from "./context";
 import { GuestOnly, Protected, PublicLayout } from "./components/layout";
 import { Logo } from "./components/ui";
 
@@ -44,6 +44,18 @@ function PageLoader() {
   );
 }
 
+/**
+ * Root entry gatekeeper:
+ * - Unauthenticated visitors immediately see the Login page.
+ * - Authenticated visitors are automatically routed to their Account Dashboard.
+ */
+function AuthGate() {
+  const { user, initializing } = useAuth();
+  if (initializing) return <PageLoader />;
+  if (user) return <Navigate to="/dashboard" replace />;
+  return <Navigate to="/login" replace />;
+}
+
 export default function App() {
   return (
     <AppProviders>
@@ -51,9 +63,12 @@ export default function App() {
         <ScrollToTop />
         <Suspense fallback={<PageLoader />}>
           <Routes>
-            {/* public marketing */}
+            {/* Root entry — guests see login first, logged-in users see account */}
+            <Route path="/" element={<AuthGate />} />
+
+            {/* Public marketing & legal pages */}
             <Route element={<PublicLayout />}>
-              <Route path="/" element={<Landing />} />
+              <Route path="/landing" element={<Landing />} />
               <Route path="/features" element={<FeaturesPage />} />
               <Route path="/pricing" element={<PricingPage />} />
               <Route path="/terms" element={<TermsPage />} />
@@ -63,13 +78,13 @@ export default function App() {
               <Route path="*" element={<NotFoundPage />} />
             </Route>
 
-            {/* auth (guest only) */}
+            {/* Auth (guest only — logged in users are redirected to their account) */}
             <Route path="/login" element={<GuestOnly><LoginPage /></GuestOnly>} />
             <Route path="/register" element={<GuestOnly><RegisterPage /></GuestOnly>} />
             <Route path="/forgot-password" element={<GuestOnly><ForgotPasswordPage /></GuestOnly>} />
             <Route path="/reset-password" element={<GuestOnly><ResetPasswordPage /></GuestOnly>} />
 
-            {/* authenticated app */}
+            {/* Authenticated app / account area */}
             <Route element={<Protected />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/job-match" element={<JobMatch />} />

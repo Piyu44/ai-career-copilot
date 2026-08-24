@@ -122,7 +122,7 @@ function Hero() {
       <div className="container-x relative grid items-center gap-14 pb-20 pt-14 lg:grid-cols-[1.02fr_0.98fr] lg:pb-28 lg:pt-20">
         <div className="animate-fade-up">
           <Badge tone="brand" className="glass-chip mb-5 py-1">
-            <Sparkles className="h-3.5 w-3.5" /> AI-powered job search copilot for India
+            <Sparkles className="h-3.5 w-3.5" /> India's #1 AI Career & Resume Companion
           </Badge>
           <h1 className="font-display text-[42px] font-bold leading-[1.04] tracking-tight sm:text-6xl">
             <span className="text-3d text-white">Get More</span>
@@ -558,8 +558,8 @@ function TrackerShowcase() {
 
 export default function Landing() {
   usePageMeta(
-    "AI Career Copilot — Your AI Partner in Getting Hired",
-    "Upload your resume, paste a job description, and let AI analyze your match, improve your resume, write cover letters and run mock interviews."
+    "CareerDost — India's AI Resume Builder & Career Companion",
+    "Upload your resume, paste a job description, and let CareerDost AI analyze your match, improve your resume, write cover letters and run mock interviews."
   );
   return (
     <>

@@ -33,7 +33,7 @@ app.use(
 
 /* -------------------------------- routes -------------------------------- */
 app.get("/api/health", (_req, res) =>
-  res.json({ ok: true, service: "ai-career-copilot-api", mockAi: process.env.USE_MOCK_AI !== "false" })
+  res.json({ ok: true, service: "careerdost-api", mockAi: process.env.USE_MOCK_AI !== "false" })
 );
 app.use("/api", routes);
 
@@ -45,6 +45,6 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
   app.listen(PORT, () =>
-    console.log(`✅ AI Career Copilot API listening on :${PORT} (mock AI: ${process.env.USE_MOCK_AI !== "false"})`)
+    console.log(`✅ CareerDost AI API listening on :${PORT} (mock AI: ${process.env.USE_MOCK_AI !== "false"})`)
   );
 });

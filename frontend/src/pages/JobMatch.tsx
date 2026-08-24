@@ -24,7 +24,7 @@ const ANALYZE_STEPS = [
 ];
 
 export default function JobMatch() {
-  usePageMeta("Job Match Analysis — AI Career Copilot", "Analyze your resume against any job description and get a match score with missing skills and keywords.");
+  usePageMeta("Job Match Analysis — CareerDost AI", "Analyze your resume against any job description and get a match score with missing skills and keywords.");
   const { user, spendCredits } = useAuth();
   const { resumes, addAnalysis } = useData();
   const { toast } = useToast();
@@ -139,7 +139,7 @@ export default function JobMatch() {
   const downloadReport = () => {
     if (!analysis) return;
     downloadPdf(`${analysis.jobTitle}-${analysis.company}-match-report`.replace(/\s+/g, "-").toLowerCase(), `Job Match Report — ${analysis.jobTitle} @ ${analysis.company}`, [
-      { heading: "Overview", text: `Overall match: ${analysis.matchScore}% (AI Career Copilot internal assessment — not an employer ATS score). Analyzed ${new Date(analysis.createdAt).toLocaleDateString("en-IN")}.` },
+      { heading: "Overview", text: `Overall match: ${analysis.matchScore}% (CareerDost internal assessment — not an employer ATS score). Analyzed ${new Date(analysis.createdAt).toLocaleDateString("en-IN")}.` },
       { heading: "Category Scores", bullet: [
         `Skills: ${analysis.categoryScores.skills}%`,
         `Keywords: ${analysis.categoryScores.keywords}%`,
@@ -346,7 +346,7 @@ export default function JobMatch() {
           <div className="flex flex-col items-center">
             <ScoreRing value={a.matchScore} size={168} stroke={13} caption="Overall match" />
             <p className="mt-3 max-w-[260px] text-center text-xs leading-relaxed text-ink-400">
-              This is AI Career Copilot's internal assessment — <strong className="text-ink-600">not</strong> the score an employer's ATS would give.
+              This is CareerDost's internal assessment — <strong className="text-ink-600">not</strong> the score an employer's ATS would give.
             </p>
           </div>
           <div className="mt-6 space-y-4">

@@ -55,7 +55,7 @@ export function Navbar() {
       )}
     >
       <div className="container-x flex h-16 items-center justify-between gap-4">
-        <Link to="/" aria-label="AI Career Copilot home"><Logo /></Link>
+        <Link to="/" aria-label="CareerDost AI home"><Logo /></Link>
         <nav className="hidden items-center gap-1 md:flex">
           {PUBLIC_LINKS.map((l) =>
             l.hash ? (
@@ -118,7 +118,7 @@ export function Footer() {
         <div>
           <Logo />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink-400">
-            Your AI partner in getting hired — analyze, improve and personalize every application.
+            India's AI Career Companion — analyze, improve, and personalize every application to land your dream job.
           </p>
           <Badge tone="brand" className="mt-4">
             <span className="h-1.5 w-1.5 animate-pulse-soft rounded-full bg-brand-300 shadow-[0_0_8px_rgba(196,181,253,.9)]" /> Demo mode · no AI key required
@@ -144,7 +144,7 @@ export function Footer() {
       </div>
       <div className="relative border-t border-white/8">
         <div className="container-x flex flex-col items-center justify-between gap-3 py-5 text-xs text-ink-400/80 sm:flex-row">
-          <p>© 2026 AI Career Copilot · Built for Indian students, freshers & developers</p>
+          <p>© 2026 CareerDost · India's AI Resume & Career Companion</p>
           <p>Match & ATS scores are internal assessments — not employer ATS results.</p>
         </div>
       </div>

@@ -13,7 +13,7 @@ import { DEMO_ACCOUNT } from "../services/api";
 import { cn, formatDate, timeAgo } from "../utils";
 
 export default function SettingsPage() {
-  usePageMeta("Settings — AI Career Copilot");
+  usePageMeta("Settings — CareerDost AI");
   const { user, updateUser, usage, logout, sendVerificationEmail, checkEmailVerified } = useAuth();
   const { resetAll } = useData();
   const { toast } = useToast();
