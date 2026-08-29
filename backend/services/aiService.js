@@ -13,18 +13,31 @@
  */
 import { mockProvider } from "./providers/mockProvider.js";
 import { openaiProvider } from "./providers/openaiProvider.js";
+import { geminiProvider } from "./providers/geminiProvider.js";
 import { AppError } from "../utils/AppError.js";
 
 function getProvider() {
   if (process.env.USE_MOCK_AI === "false") {
-    switch (process.env.AI_PROVIDER) {
-      case "openai":
-        if (!process.env.AI_API_KEY)
-          throw new AppError("AI_API_KEY missing — set it or run with USE_MOCK_AI=true.", 503);
-        return openaiProvider;
-      default:
-        throw new AppError(`Unknown AI_PROVIDER: ${process.env.AI_PROVIDER}`, 500);
+    const provider = (process.env.AI_PROVIDER || "").toLowerCase();
+
+    // Auto-detect or explicit choice
+    if (provider === "gemini" || process.env.GEMINI_API_KEY || (process.env.AI_API_KEY && process.env.AI_API_KEY.startsWith("AIza"))) {
+      const key = process.env.GEMINI_API_KEY || process.env.AI_API_KEY;
+      if (!key) throw new AppError("GEMINI_API_KEY missing — set it or run with USE_MOCK_AI=true.", 503);
+      return geminiProvider;
     }
+
+    if (provider === "openai" || process.env.OPENAI_API_KEY || (process.env.AI_API_KEY && process.env.AI_API_KEY.startsWith("sk-"))) {
+      const key = process.env.OPENAI_API_KEY || process.env.AI_API_KEY;
+      if (!key) throw new AppError("OPENAI_API_KEY / AI_API_KEY missing — set it or run with USE_MOCK_AI=true.", 503);
+      return openaiProvider;
+    }
+
+    // Default to gemini if provider set to gemini, or openai
+    if (provider === "gemini") return geminiProvider;
+    if (provider === "openai") return openaiProvider;
+
+    throw new AppError(`Unknown or unconfigured AI_PROVIDER: ${process.env.AI_PROVIDER}. Use 'gemini' or 'openai'.`, 500);
   }
   return mockProvider;
 }
