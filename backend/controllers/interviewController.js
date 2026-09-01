@@ -56,8 +56,17 @@ export const listInterviews = asyncHandler(async (req, res) => {
   res.json(list.slice(0, 20));
 });
 
+/** POST /api/interview/evaluate — evaluates one answer statelessly */
+export const evaluateStateless = asyncHandler(async (req, res) => {
+  const { question, answer, role } = req.body;
+  // Cost credits? The frontend spends credits at the start of the session.
+  const evaluation = await aiService.evaluateInterviewAnswer({ question, answer, role: role || "Candidate" });
+  res.json(evaluation);
+});
+
 export default {
   startInterview,
   submitAnswer,
   listInterviews,
+  evaluateStateless,
 };

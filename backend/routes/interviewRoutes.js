@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import { startInterview, submitAnswer, listInterviews } from "../controllers/interviewController.js";
+import { startInterview, submitAnswer, listInterviews, evaluateStateless } from "../controllers/interviewController.js";
 import { protect } from "../middleware/auth.js";
 import { validate } from "../middleware/validate.js";
 
@@ -15,6 +15,12 @@ router.post(
     difficulty: z.enum(["beginner", "intermediate", "advanced"]).default("beginner"),
   })),
   startInterview
+);
+
+router.post(
+  "/evaluate",
+  validate(z.object({ answer: z.string().trim().min(10, "Answer is too short").max(8000) })),
+  evaluateStateless
 );
 
 router.post(

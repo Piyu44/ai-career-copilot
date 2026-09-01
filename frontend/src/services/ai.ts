@@ -239,6 +239,17 @@ export async function improveResume(
   jobTitle: string,
   variant = 0
 ): Promise<ImproveResult> {
+  if (!USE_MOCK) {
+    const res = await fetch("/api/resume/improve", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ resumeText, jobDescription, jobTitle, variant }),
+    });
+    if (!res.ok) throw new Error("Failed to improve resume");
+    return await res.json();
+  }
+
   await delay(1500);
   const original = resumeText || DEMO_RESUME_TEXT;
   const jdSkills = jobDescription ? extractSkills(jobDescription) : [];
@@ -361,6 +372,17 @@ export async function generateCoverLetter(input: {
   tone: LetterTone;
   jobDescription?: string;
 }): Promise<{ subject: string; letter: string }> {
+  if (!USE_MOCK) {
+    const res = await fetch("/api/cover-letter/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ ...input, position: input.jobTitle }), // Backend expects 'position'
+    });
+    if (!res.ok) throw new Error("Failed to generate cover letter");
+    return await res.json();
+  }
+
   await delay(1400);
   const { resumeText, company, jobTitle, tone, jobDescription } = input;
   const skills = (jobDescription ? extractSkills(jobDescription).filter((s) => extractSkills(resumeText).includes(s)) : extractSkills(resumeText)).slice(0, 4);
@@ -402,6 +424,17 @@ export interface AtsResult {
 }
 
 export async function atsCheck(resumeText: string, jobDescription?: string): Promise<AtsResult> {
+  if (!USE_MOCK) {
+    const res = await fetch("/api/resume/ats-check", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ resumeText, jobDescription }),
+    });
+    if (!res.ok) throw new Error("Failed to check ATS score");
+    return await res.json();
+  }
+
   await delay(1600);
   const t = resumeText;
   const lines = t.split("\n").filter((l) => l.trim());
@@ -491,8 +524,20 @@ export interface AnswerEval {
 
 export async function evaluateInterviewAnswer(
   question: BankQuestion,
-  answer: string
+  answer: string,
+  role?: string
 ): Promise<AnswerEval> {
+  if (!USE_MOCK) {
+    const res = await fetch("/api/interview/evaluate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ question, answer, role }),
+    });
+    if (!res.ok) throw new Error("Failed to evaluate answer");
+    return await res.json();
+  }
+
   await delay(1300);
   const a = answer.toLowerCase();
   const words = answer.trim().split(/\s+/).filter(Boolean);

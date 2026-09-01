@@ -461,10 +461,21 @@ const apiDelay = (ms = 420) => delay(ms);
 export const api = {
   analyses: {
     async list() {
+      if (!USE_MOCK) {
+        const res = await fetch("/api/job-analysis", { headers: { "Content-Type": "application/json" }, credentials: "include" });
+        if (!res.ok) throw new Error("Failed to fetch analyses");
+        return await res.json();
+      }
       await apiDelay();
       return col<any[]>("analyses", []);
     },
     async create(a: any) {
+      if (!USE_MOCK) {
+        // Only hit this endpoint if it's explicitly for saving an analysis
+        // But wait: analyzeJobMatch() endpoint itself saves to DB. 
+        // Let's just return the object if it's already saved.
+        return a;
+      }
       await apiDelay(200);
       const all = col<any[]>("analyses", []);
       const record = { ...a, id: a.id || uid() };
@@ -473,15 +484,35 @@ export const api = {
       return record;
     },
     async remove(id: string) {
+      if (!USE_MOCK) {
+        await fetch(`/api/job-analysis/${id}`, { method: "DELETE", credentials: "include" });
+        return;
+      }
       setCol("analyses", col<any[]>("analyses", []).filter((a) => a.id !== id));
     },
   },
   applications: {
     async list() {
+      if (!USE_MOCK) {
+        const res = await fetch("/api/applications", { credentials: "include" });
+        if (!res.ok) throw new Error("Failed to fetch applications");
+        return await res.json();
+      }
       await apiDelay();
       return col<any[]>("applications", []);
     },
     async save(app: any) {
+      if (!USE_MOCK) {
+        const isUpdate = !!app._id;
+        const res = await fetch(`/api/applications${isUpdate ? `/${app._id}` : ''}`, {
+          method: isUpdate ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(app),
+        });
+        if (!res.ok) throw new Error("Failed to save application");
+        return await res.json();
+      }
       await apiDelay(260);
       const all = col<any[]>("applications", []);
       const idx = all.findIndex((a) => a.id === app.id);
@@ -491,13 +522,25 @@ export const api = {
       return app;
     },
     async remove(id: string) {
+      if (!USE_MOCK) {
+        await fetch(`/api/applications/${id}`, { method: "DELETE", credentials: "include" });
+        return;
+      }
       await apiDelay(200);
       setCol("applications", col<any[]>("applications", []).filter((a) => a.id !== id));
     },
   },
   covers: {
-    list: () => col<any[]>("covers", []),
-    add(c: any) {
+    async list() {
+      if (!USE_MOCK) {
+        const res = await fetch("/api/cover-letter", { credentials: "include" });
+        if (!res.ok) throw new Error("Failed to fetch cover letters");
+        return await res.json();
+      }
+      return col<any[]>("covers", []);
+    },
+    async add(c: any) {
+      if (!USE_MOCK) return c; // Covered by POST /api/cover-letter/generate
       const all = col<any[]>("covers", []);
       all.unshift({ ...c, id: c.id || uid() });
       setCol("covers", all.slice(0, 30));
@@ -505,8 +548,25 @@ export const api = {
     },
   },
   sessions: {
-    list: () => col<any[]>("sessions", []),
-    add(s: any) {
+    async list() {
+      if (!USE_MOCK) {
+        const res = await fetch("/api/interview", { credentials: "include" });
+        if (!res.ok) throw new Error("Failed to fetch interview sessions");
+        return await res.json();
+      }
+      return col<any[]>("sessions", []);
+    },
+    async add(s: any) {
+      if (!USE_MOCK) {
+        const res = await fetch("/api/interview", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(s),
+        });
+        if (!res.ok) throw new Error("Failed to save session");
+        return await res.json();
+      }
       const all = col<any[]>("sessions", []);
       all.unshift({ ...s, id: s.id || uid() });
       setCol("sessions", all.slice(0, 20));
@@ -514,7 +574,10 @@ export const api = {
     },
   },
   notifs: {
-    list: () => col<any[]>("notifs", []),
+    async list() {
+      // Stub for real mode as we didn't add notif routes
+      return col<any[]>("notifs", []);
+    },
     markAll() {
       setCol("notifs", col<any[]>("notifs", []).map((n) => ({ ...n, read: true })));
     },
