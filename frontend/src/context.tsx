@@ -86,7 +86,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 }
 
 import { onAuthStateChanged } from "firebase/auth";
-import { ref, set, update } from "firebase/database";
+import { ref, set, update, get } from "firebase/database";
 import { auth, database } from "./services/firebase";
 import {
   firebaseLogin,
@@ -157,14 +157,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Listen for Firebase Auth state changes
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        let dbCredits = 10;
+        let dbPlan: PlanId = "free";
+        let dbName = firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "User";
+
+        try {
+          const snapshot = await get(ref(database, `users/${firebaseUser.uid}`));
+          if (snapshot.exists()) {
+            const data = snapshot.val();
+            if (typeof data.credits === "number") dbCredits = data.credits;
+            if (data.plan) dbPlan = data.plan;
+            if (data.name) dbName = data.name;
+          } else {
+            // First time user: save initial 10 credits to Realtime DB
+            await set(ref(database, `users/${firebaseUser.uid}`), {
+              id: firebaseUser.uid,
+              name: dbName,
+              email: firebaseUser.email || "",
+              plan: "free",
+              credits: 10,
+              createdAt: firebaseUser.metadata.creationTime || new Date().toISOString(),
+            });
+          }
+        } catch (dbErr) {
+          console.warn("Could not read user profile from Realtime DB:", dbErr);
+          const sessionUser = getSessionUser();
+          if (sessionUser && sessionUser.id === firebaseUser.uid) {
+            dbCredits = sessionUser.credits;
+            dbPlan = sessionUser.plan;
+          }
+        }
+
         const u: PublicUser = {
           id: firebaseUser.uid,
-          name: firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "User",
+          name: dbName,
           email: firebaseUser.email || "",
-          plan: "free",
-          credits: 10,
+          plan: dbPlan,
+          credits: dbCredits,
           createdAt: firebaseUser.metadata.creationTime || new Date().toISOString(),
           emailVerified: firebaseUser.emailVerified,
         };
@@ -366,6 +397,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const updated = consumeCredits(cost, action);
       setUser(updated);
       refreshUsage();
+
+      // Cloud sync to Realtime Database
+      if (auth.currentUser) {
+        update(ref(database, `users/${auth.currentUser.uid}`), {
+          credits: updated.credits,
+          updatedAt: new Date().toISOString(),
+        }).catch((err) => console.warn("Failed to sync credit consumption to DB:", err));
+      }
+
       return true;
     } catch (e: any) {
       toast({ title: "Credit error", desc: e?.message ?? "Something went wrong.", tone: "error" });
