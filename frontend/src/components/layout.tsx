@@ -118,10 +118,10 @@ export function Footer() {
         <div>
           <Logo />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink-400">
-            India's AI Career Companion — analyze, improve, and personalize every application to land your dream job.
+            Find It · Apply It · Get It — AI Career Copilot to analyze, improve, and personalize every application to land your dream job.
           </p>
           <Badge tone="brand" className="mt-4">
-            <span className="h-1.5 w-1.5 animate-pulse-soft rounded-full bg-brand-300 shadow-[0_0_8px_rgba(196,181,253,.9)]" /> Demo mode · no AI key required
+            <span className="h-1.5 w-1.5 animate-pulse-soft rounded-full bg-orange-400 shadow-[0_0_8px_rgba(249,115,22,.9)]" /> Demo mode · no AI key required
           </Badge>
         </div>
         {[
@@ -135,7 +135,7 @@ export function Footer() {
             <ul className="mt-4 space-y-2.5">
               {col.links.map(([label, to]) => (
                 <li key={label}>
-                  <Link to={to} className="text-sm text-ink-400 transition-colors hover:text-brand-300">{label}</Link>
+                  <Link to={to} className="text-sm text-ink-400 transition-colors hover:text-orange-300">{label}</Link>
                 </li>
               ))}
             </ul>

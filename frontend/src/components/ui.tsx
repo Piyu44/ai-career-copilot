@@ -81,17 +81,17 @@ type Size = "sm" | "md" | "lg";
 
 const variantCls: Record<Variant, string> = {
   primary:
-    "bg-gradient-to-b from-brand-500 via-brand-600 to-brand-800 text-white " +
-    "shadow-[inset_0_1px_0_rgba(255,255,255,.4),inset_0_-2px_0_rgba(30,10,70,.45),0_12px_28px_-10px_rgba(139,92,246,.65)] " +
-    "hover:brightness-110 active:translate-y-[2px] active:shadow-[inset_0_1px_0_rgba(255,255,255,.3),0_4px_12px_-6px_rgba(139,92,246,.5)]",
+    "bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 text-white font-bold " +
+    "shadow-[inset_0_1px_0_rgba(255,255,255,.4),0_12px_28px_-8px_rgba(249,115,22,.6)] " +
+    "hover:brightness-110 hover:shadow-[0_16px_32px_-6px_rgba(249,115,22,.7)] active:translate-y-[2px] active:shadow-[inset_0_1px_0_rgba(255,255,255,.3),0_4px_12px_-6px_rgba(249,115,22,.5)]",
   secondary:
-    "glass-chip text-ink-700 hover:bg-white/12 hover:text-white hover:border-brand-300/40 " +
-    "shadow-[0_10px_24px_-14px_rgba(2,0,12,.8)] active:translate-y-[1px]",
+    "glass-chip text-ink-700 hover:bg-white/12 hover:text-white hover:border-orange-400/40 " +
+    "shadow-[0_10px_24px_-14px_rgba(0,0,0,.8)] active:translate-y-[1px]",
   ghost: "text-ink-400 hover:bg-white/8 hover:text-ink-800",
   danger:
     "bg-gradient-to-b from-rose-500 to-rose-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,.35),0_12px_26px_-10px_rgba(225,29,72,.55)] hover:brightness-110 active:translate-y-[2px]",
-  dark: "bg-coal-800 text-white ring-1 ring-white/12 shadow-[inset_0_1px_0_rgba(255,255,255,.08),0_12px_28px_-14px_rgba(2,0,12,.9)] hover:bg-coal-700 active:translate-y-[1px]",
-  outline: "text-brand-300 ring-1 ring-brand-400/45 hover:bg-brand-500/12 hover:text-brand-200",
+  dark: "bg-coal-800 text-white ring-1 ring-white/12 shadow-[inset_0_1px_0_rgba(255,255,255,.08),0_12px_28px_-14px_rgba(0,0,0,.9)] hover:bg-coal-700 active:translate-y-[1px]",
+  outline: "text-orange-300 ring-1 ring-orange-400/45 hover:bg-orange-500/12 hover:text-orange-200",
 };
 const sizeCls: Record<Size, string> = {
   sm: "h-8 px-3 text-[13px] gap-1.5",
@@ -264,7 +264,7 @@ export const Toggle = ({
     <span
       className={cn(
         "relative h-6 w-11 rounded-full ring-1 transition-colors duration-200",
-        on ? "bg-gradient-to-b from-brand-500 to-brand-700 ring-brand-400/40 shadow-[0_0_14px_rgba(139,92,246,.5)]" : "bg-white/10 ring-white/15"
+        on ? "bg-gradient-to-r from-orange-500 to-purple-600 ring-orange-400/40 shadow-[0_0_14px_rgba(249,115,22,.5)]" : "bg-white/10 ring-white/15"
       )}
     >
       <span
@@ -517,7 +517,7 @@ export function ScoreRing({
     const t = setTimeout(() => setOffset(1 - value / 100), 60);
     return () => clearTimeout(t);
   }, [value]);
-  const color = value >= 75 ? "#a78bfa" : value >= 55 ? "#fbbf24" : "#fb7185";
+  const color = value >= 75 ? "#f97316" : value >= 55 ? "#fbbf24" : "#fb7185";
   return (
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
@@ -561,7 +561,7 @@ export const Bar = ({
     return () => clearTimeout(t);
   }, [value]);
   const tones = {
-    brand: "bg-gradient-to-r from-brand-600 to-brand-400 shadow-[0_0_10px_rgba(139,92,246,.5)]",
+    brand: "bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 shadow-[0_0_12px_rgba(249,115,22,.5)]",
     emerald: "bg-gradient-to-r from-emerald-500 to-emerald-400 shadow-[0_0_10px_rgba(16,185,129,.4)]",
     amber: "bg-gradient-to-r from-amber-500 to-amber-400 shadow-[0_0_10px_rgba(245,158,11,.4)]",
     rose: "bg-gradient-to-r from-rose-500 to-rose-400 shadow-[0_0_10px_rgba(244,63,94,.4)]",
@@ -586,7 +586,7 @@ export const Stepper = ({ steps, current }: { steps: string[]; current: number }
             className={cn(
               "flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-colors",
               i < current && "bg-emerald-500 text-white shadow-[0_0_12px_rgba(16,185,129,.5)]",
-              i === current && "bg-gradient-to-b from-brand-500 to-brand-700 text-white ring-4 ring-brand-500/20 shadow-[0_0_16px_rgba(139,92,246,.55)]",
+              i === current && "bg-gradient-to-r from-orange-500 to-purple-600 text-white ring-4 ring-orange-500/20 shadow-[0_0_16px_rgba(249,115,22,.55)]",
               i > current && "bg-white/8 text-ink-300 ring-1 ring-white/12"
             )}
           >
