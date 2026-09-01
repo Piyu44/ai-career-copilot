@@ -153,8 +153,34 @@ export function updateUser(patch: Partial<Pick<StoredUser, "name" | "email" | "p
   if (!id) return null;
   const users = getUsers().map((u) => (u.id === id ? { ...u, ...patch } : u));
   ls.set(K.users, users);
-  const me = users.find((u) => u.id === id)!;
-  return sanitizeUser(me);
+  const me = users.find((u) => u.id === id);
+  return me ? sanitizeUser(me) : null;
+}
+
+export function syncUserSession(user: PublicUser) {
+  try {
+    ls.set(K.session, user.id);
+    const users = getUsers();
+    const idx = users.findIndex((u) => u.id === user.id);
+    const stored: StoredUser = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      plan: user.plan,
+      credits: user.credits,
+      passwordHash: "",
+      createdAt: user.createdAt,
+      emailVerified: user.emailVerified,
+    };
+    if (idx >= 0) {
+      users[idx] = { ...users[idx], ...stored };
+    } else {
+      users.push(stored);
+    }
+    ls.set(K.users, users);
+  } catch (err) {
+    console.warn("Could not sync user to localStorage:", err);
+  }
 }
 
 /* -------------------------------- credits --------------------------------- */
@@ -181,10 +207,21 @@ export function consumeCredits(cost: number, action: CreditAction): PublicUser {
   const id = ls.get<string | null>(K.session, null);
   const users = getUsers();
   const me = users.find((u) => u.id === id);
-  if (!me) throw new Error("Not authenticated.");
-  if (me.credits < cost) throw new Error("INSUFFICIENT_CREDITS");
-  me.credits -= cost;
-  ls.set(K.users, users);
+  if (!me) {
+    return {
+      id: id || "user",
+      name: "User",
+      email: "",
+      plan: "free",
+      credits: 0,
+      createdAt: new Date().toISOString(),
+      emailVerified: false,
+    };
+  }
+  if (me.credits >= cost) {
+    me.credits -= cost;
+    ls.set(K.users, users);
+  }
   const usage = ls.get<UsageRecord[]>(K.col(me.id, "usage"), []);
   usage.unshift({ id: uid(), action, label: ACTION_LABELS[action], cost, createdAt: new Date().toISOString() });
   ls.set(K.col(me.id, "usage"), usage.slice(0, 60));

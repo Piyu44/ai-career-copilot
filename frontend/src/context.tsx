@@ -18,6 +18,7 @@ import {
   loginUser,
   logout as apiLogout,
   registerUser,
+  syncUserSession,
   updateUser as apiUpdateUser,
   DEMO_ACCOUNT,
   type PublicUser,
@@ -200,6 +201,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           emailVerified: firebaseUser.emailVerified,
         };
         setUser(u);
+        syncUserSession(u);
       } else {
         // Fallback to local session if present (for demo accounts)
         const sessionUser = getSessionUser();
@@ -268,6 +270,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       emailVerified: res.user.emailVerified,
     };
     setUser(u);
+    syncUserSession(u);
     return u;
   };
 
@@ -287,6 +290,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       emailVerified: res.user.emailVerified,
     };
     setUser(u);
+    syncUserSession(u);
     return u;
   };
 
@@ -399,25 +403,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user) refreshUsage();
   }, [user, refreshUsage]);
 
-  const spendCredits = (action: CreditAction) => {
-    const cost = CREDIT_COSTS[action];
-    if (!hasEnoughCredits(cost)) {
+  const spendCredits = (action: CreditAction): boolean => {
+    const cost = CREDIT_COSTS[action] ?? 1;
+    const currentCredits = user?.credits ?? 0;
+
+    if (currentCredits < cost) {
       toast({
         title: "Not enough credits",
-        desc: `This action needs ${cost} credits and you have ${getUserCredits()}. Upgrade your plan to continue.`,
+        desc: `This action needs ${cost} credits. You currently have ${currentCredits} credits. Upgrade your plan to continue.`,
         tone: "warning",
       });
       return false;
     }
+
     try {
-      const updated = consumeCredits(cost, action);
-      setUser(updated);
+      const newCredits = Math.max(0, currentCredits - cost);
+      const updatedUser: PublicUser = {
+        ...(user || {
+          id: auth.currentUser?.uid || "user",
+          name: "User",
+          email: auth.currentUser?.email || "user@example.com",
+          plan: "free",
+          createdAt: new Date().toISOString(),
+          emailVerified: false,
+        }),
+        credits: newCredits,
+      };
+
+      setUser(updatedUser);
+      syncUserSession(updatedUser);
+
+      try {
+        consumeCredits(cost, action);
+      } catch {
+        // non-blocking
+      }
       refreshUsage();
 
-      // Cloud sync to Realtime Database
+      // Cloud sync to Firebase Realtime Database
       if (auth.currentUser) {
         update(ref(database, `users/${auth.currentUser.uid}`), {
-          credits: updated.credits,
+          credits: newCredits,
           updatedAt: new Date().toISOString(),
         }).catch((err) => console.warn("Failed to sync credit consumption to DB:", err));
       }
