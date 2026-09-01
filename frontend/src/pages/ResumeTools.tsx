@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   CheckCircle2, Copy, FileDown, FileText, Lightbulb, RefreshCw, Save,
-  ShieldCheck, Sparkles, Wand2, XCircle, Zap,
+  ShieldCheck, Sparkles, Upload, Wand2, XCircle, Zap,
 } from "lucide-react";
 import {
   Badge, Bar, Button, Card, EmptyState, Field, PageHeader, ScoreRing, Select,
@@ -12,6 +12,7 @@ import { UpgradeModal } from "../components/sections";
 import { useAuth, useData, useToast } from "../context";
 import { usePageMeta } from "../hooks";
 import { atsCheck, improveResume, type AtsResult, type ImproveResult } from "../services/ai";
+import { fileStorage } from "../services/api";
 import { CREDIT_COSTS } from "../data";
 import { cn, copyText, downloadDocx, downloadPdf, jobCtx, uid } from "../utils";
 
@@ -22,6 +23,7 @@ export function ResumeToolsPage() {
   const { user, spendCredits } = useAuth();
   const { resumes, analyses, saveResume } = useData();
   const { toast } = useToast();
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const [resumeId, setResumeId] = useState("");
   const [resumeText, setResumeText] = useState("");
@@ -35,6 +37,23 @@ export function ResumeToolsPage() {
   const [regenSection, setRegenSection] = useState<string | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const onFileUpload = async (f: File | undefined) => {
+    if (!f) return;
+    try {
+      fileStorage.validate(f.name, f.size);
+      const text = await fileStorage.readText(f);
+      if (text) {
+        setResumeText(text);
+        setResumeId("");
+        toast({ title: "Resume loaded", desc: `${f.name} · ${Math.round(f.size / 1024)} KB`, tone: "success" });
+      } else {
+        toast({ title: "Could not read file", desc: "Please upload a text-based PDF, DOCX, or paste your resume text.", tone: "info" });
+      }
+    } catch (e: any) {
+      toast({ title: "File rejected", desc: e.message, tone: "error" });
+    }
+  };
 
   useEffect(() => {
     const ctx = jobCtx.get();
@@ -120,16 +139,27 @@ export function ResumeToolsPage() {
       <Card className="p-6">
         <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
           <div>
-            <div className="mb-2 flex items-center justify-between">
+            <input ref={fileRef} type="file" accept=".pdf,.docx,.doc,.txt,.md" className="hidden" onChange={(e) => onFileUpload(e.target.files?.[0])} />
+            <div className="mb-2 flex items-center justify-between gap-2">
               <span className="text-[13px] font-semibold text-ink-700">Your resume</span>
-              {resumes.length > 0 && (
-                <Select value={resumeId} onChange={(e) => { setResumeId(e.target.value); const r = resumes.find((x) => x.id === e.target.value); if (r) setResumeText(r.text); }} className="h-8 w-44 text-xs">
-                  <option value="">— paste below —</option>
-                  {resumes.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
-                </Select>
-              )}
+              <div className="flex items-center gap-2">
+                <Button size="sm" variant="ghost" icon={<Upload className="h-3 w-3" />} onClick={() => fileRef.current?.click()} className="h-8 text-xs">
+                  Upload file
+                </Button>
+                {resumes.length > 0 && (
+                  <Select value={resumeId} onChange={(e) => { setResumeId(e.target.value); const r = resumes.find((x) => x.id === e.target.value); if (r) setResumeText(r.text); }} className="h-8 w-40 text-xs">
+                    <option value="">— saved resumes —</option>
+                    {resumes.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+                  </Select>
+                )}
+              </div>
             </div>
-            <Textarea rows={8} value={resumeText} onChange={(e) => setResumeText(e.target.value)} placeholder="Paste your resume text…" className="font-mono text-[12.5px]" />
+            <Textarea rows={8} value={resumeText} onChange={(e) => setResumeText(e.target.value)} placeholder="Paste your resume text or click 'Upload file' above…" className="font-mono text-[12.5px]" />
+            <div className="mt-1.5 flex items-center justify-between">
+              <p className="text-[11px] font-medium text-ink-400">
+                {resumeText.trim() ? `${resumeText.trim().split(/\s+/).length} words detected` : "Supports PDF, DOCX, TXT"}
+              </p>
+            </div>
             {errors.resume && <p className="mt-1.5 text-xs font-semibold text-rose-600">{errors.resume}</p>}
           </div>
           <div>

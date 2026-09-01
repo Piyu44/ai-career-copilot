@@ -242,17 +242,72 @@ export const fileStorage = {
   /** Extracts text from PDF, DOCX, TXT, and MD files */
   async readText(file: File): Promise<string | null> {
     try {
-      // 1. Plain text & markdown files
+      // 1. Plain text, markdown, csv, rtf
       if (/\.(txt|md|csv|rtf|json)$/i.test(file.name)) {
         return await file.text();
       }
 
-      // 2. Word documents (.docx)
+      // 2. Word documents (.docx) — unzip word/document.xml and extract text
       if (/\.docx$/i.test(file.name)) {
         const buffer = await file.arrayBuffer();
+        const bytes = new Uint8Array(buffer);
+        const view = new DataView(buffer);
+        let offset = 0;
+
+        while (offset + 30 <= bytes.length) {
+          const sig = view.getUint32(offset, true);
+          if (sig !== 0x04034b50) {
+            offset++;
+            continue;
+          }
+
+          const compression = view.getUint16(offset + 8, true);
+          const compressedSize = view.getUint32(offset + 18, true);
+          const fileNameLen = view.getUint16(offset + 26, true);
+          const extraLen = view.getUint16(offset + 28, true);
+
+          const fileNameBytes = bytes.subarray(offset + 30, offset + 30 + fileNameLen);
+          const fileName = new TextDecoder().decode(fileNameBytes);
+          const dataOffset = offset + 30 + fileNameLen + extraLen;
+
+          if (fileName === "word/document.xml") {
+            const compressedData = bytes.subarray(dataOffset, dataOffset + compressedSize);
+            let xmlText = "";
+
+            if (compression === 8 && typeof DecompressionStream !== "undefined") {
+              try {
+                const ds = new DecompressionStream("deflate-raw");
+                const stream = new Response(compressedData).body;
+                if (stream) {
+                  const decompressedStream = stream.pipeThrough(ds);
+                  xmlText = await new Response(decompressedStream).text();
+                }
+              } catch (deflateErr) {
+                console.warn("Deflate stream error:", deflateErr);
+              }
+            } else if (compression === 0) {
+              xmlText = new TextDecoder().decode(compressedData);
+            }
+
+            if (xmlText) {
+              const docxMatches = xmlText.match(/<w:t[^>]*>([^<]+)<\/w:t>/g);
+              if (docxMatches && docxMatches.length > 0) {
+                const text = docxMatches
+                  .map((m) => m.replace(/<w:t[^>]*>/, "").replace(/<\/w:t>/, ""))
+                  .join(" ");
+                if (text.trim().length > 15) {
+                  return text.replace(/\s+/g, " ").trim();
+                }
+              }
+            }
+          }
+
+          offset = dataOffset + (compressedSize > 0 ? compressedSize : 1);
+        }
+
+        // Fallback for DOCX: scan for text tags
         const decoder = new TextDecoder("utf-8", { fatal: false });
         const raw = decoder.decode(buffer);
-
         const matches = raw.match(/<w:t[^>]*>([^<]+)<\/w:t>/g);
         if (matches && matches.length > 0) {
           const text = matches
@@ -296,23 +351,23 @@ export const fileStorage = {
           });
         }
 
-        if (extracted.length > 4) {
+        if (extracted.length > 3) {
           const cleanedText = extracted
             .join(" ")
             .replace(/\\([()\\])/g, "$1")
             .replace(/\s+/g, " ")
             .trim();
-          if (cleanedText.length > 30) {
+          if (cleanedText.length > 25) {
             return cleanedText;
           }
         }
 
-        // Fallback: extract continuous ASCII word streams from PDF
+        // Fallback: extract continuous readable words from PDF
         const words = raw.match(/[A-Za-z0-9,.:;@/+\-()]{3,}/g);
-        if (words && words.length > 20) {
+        if (words && words.length > 15) {
           const pdfKeywords = new Set(["obj", "endobj", "stream", "endstream", "xref", "trailer", "startxref", "Font", "Type", "Page", "Pages", "Catalog", "Length", "Filter", "FlateDecode", "MediaBox", "Contents", "Resources"]);
           const filtered = words.filter((w) => !pdfKeywords.has(w));
-          if (filtered.length > 15) {
+          if (filtered.length > 10) {
             return filtered.join(" ");
           }
         }
@@ -321,11 +376,11 @@ export const fileStorage = {
       // 4. Universal fallback text extraction
       const rawText = await file.text();
       const cleanAscii = rawText.replace(/[^\x20-\x7E\n\r\t]/g, " ").replace(/\s+/g, " ").trim();
-      if (cleanAscii.length > 50) {
+      if (cleanAscii.length > 40) {
         return cleanAscii;
       }
     } catch (err) {
-      console.warn("Client-side text extraction notice:", err);
+      console.warn("Client-side text extraction error:", err);
     }
     return null;
   },

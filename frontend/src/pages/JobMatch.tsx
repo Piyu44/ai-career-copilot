@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  ArrowLeft, ArrowRight, BadgeCheck, CheckCircle2, FileText, GraduationCap,
-  Lightbulb, Mail, Mic, RefreshCw, Sparkles, Target, Upload, XCircle, Zap,
+  ArrowLeft, ArrowRight, BadgeCheck, CheckCircle2, Edit3, FileCheck, FileText, GraduationCap,
+  Lightbulb, Mail, Mic, RefreshCw, Sparkles, Target, Trash2, Upload, XCircle, Zap,
 } from "lucide-react";
 import {
   Badge, Bar, Button, Card, Field, Input, PageHeader, ScoreRing, SkillChip,
@@ -214,6 +214,62 @@ export default function JobMatch() {
                 </button>
               </div>
             </div>
+          ) : resumeText.trim() ? (
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-5 backdrop-blur-md">
+              <input ref={fileRef} type="file" accept=".pdf,.docx,.doc,.txt,.md" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                    <FileCheck className="h-6 w-6" />
+                  </span>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-display text-base font-bold text-white">
+                        {resumeName || "Uploaded Resume"}
+                      </h3>
+                      <Badge tone="emerald">✓ Ready for analysis</Badge>
+                    </div>
+                    <p className="mt-1 text-xs text-ink-400">
+                      {resumeText.trim().split(/\s+/).length} words · {resumeText.length} characters extracted
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    icon={<Upload className="h-3.5 w-3.5" />}
+                    onClick={() => fileRef.current?.click()}
+                  >
+                    Replace File
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    icon={<Edit3 className="h-3.5 w-3.5" />}
+                    onClick={() => setTab("paste")}
+                  >
+                    Edit Text
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    icon={<Trash2 className="h-3.5 w-3.5" />}
+                    onClick={() => { setResumeText(""); setResumeName(""); }}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              </div>
+              <div className="mt-4">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-ink-400 mb-1.5">
+                  Extracted Resume Preview:
+                </p>
+                <div className="max-h-28 overflow-y-auto rounded-lg bg-black/40 p-3 font-mono text-xs leading-relaxed text-ink-300 ring-1 ring-white/10 no-scrollbar">
+                  {resumeText.slice(0, 350)}...
+                </div>
+              </div>
+            </div>
           ) : (
             <div
               onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
@@ -222,18 +278,18 @@ export default function JobMatch() {
               onClick={() => fileRef.current?.click()}
               className={cn(
                 "flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-14 text-center transition-all",
-                drag ? "border-brand-500 bg-brand-50" : "border-ink-200 bg-ink-50/50 hover:border-brand-300 hover:bg-brand-50/40"
+                drag ? "border-orange-500 bg-orange-500/10 shadow-[0_0_30px_rgba(249,115,22,0.25)]" : "border-white/15 bg-white/[0.02] hover:border-orange-400/50 hover:bg-orange-500/5"
               )}
             >
               <input ref={fileRef} type="file" accept=".pdf,.docx,.doc,.txt,.md" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
-              <span className="glass-deep flex h-14 w-14 items-center justify-center rounded-2xl text-brand-300 shadow-[0_0_30px_rgba(139,92,246,.25)]">
+              <span className="glass-deep flex h-14 w-14 items-center justify-center rounded-2xl text-orange-300 shadow-[0_0_30px_rgba(249,115,22,.25)]">
                 <Upload className="h-6 w-6" />
               </span>
-              <p className="mt-4 text-sm font-bold text-ink-800">Drop your resume here, or click to browse</p>
-              <p className="mt-1 text-xs font-medium text-ink-400">PDF or DOCX · up to 5 MB · parsed via the storage abstraction</p>
+              <p className="mt-4 text-sm font-bold text-white">Drop your Word (.docx) or PDF resume here, or click to browse</p>
+              <p className="mt-1 text-xs font-medium text-ink-400">PDF, DOCX, DOC, TXT · up to 5 MB · auto-extracted</p>
             </div>
           )}
-          {errors.resume && <p className="mt-2 text-sm font-semibold text-rose-600">{errors.resume}</p>}
+          {errors.resume && <p className="mt-2 text-sm font-semibold text-rose-500">{errors.resume}</p>}
         </Card>
 
         <Card className="mt-5 p-6">
