@@ -49,7 +49,11 @@ export default function InterviewPage() {
   const [evalRes, setEvalRes] = useState<AnswerEval | null>(null);
   const [showBetter, setShowBetter] = useState(false);
   const [records, setRecords] = useState<{ q: BankQuestion; a: string; e: AnswerEval }[]>([]);
-  const [history, setHistory] = useState<SessionRecord[]>(api.sessions.list());
+  const [history, setHistory] = useState<SessionRecord[]>([]);
+
+  useEffect(() => {
+    api.sessions.list().then(setHistory).catch(console.error);
+  }, []);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [listening, setListening] = useState(false);
 
@@ -88,8 +92,9 @@ export default function InterviewPage() {
         date: new Date().toISOString(),
         results: records.map((r) => ({ q: r.q.q, overall: r.e.overall })),
       };
-      api.sessions.add(session);
-      setHistory(api.sessions.list());
+      api.sessions.add(session).then(async () => {
+        setHistory(await api.sessions.list());
+      }).catch(console.error);
       setPhase("summary");
       toast({ title: `Session complete — ${avg}/10 average`, tone: avg >= 7 ? "success" : "info" });
       return;

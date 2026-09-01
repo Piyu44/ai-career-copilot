@@ -511,11 +511,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     setLoading(true);
-    const [a, ap] = await Promise.all([api.analyses.list(), api.applications.list()]);
+    const [a, ap, n] = await Promise.all([api.analyses.list(), api.applications.list(), api.notifs.list()]);
     setAnalyses(a);
     setApplications(ap);
     setResumes(fileStorage.listResumes());
-    setNotifs(api.notifs.list());
+    setNotifs(n);
     setLoading(false);
   }, [user]);
 
@@ -540,9 +540,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     fileStorage.saveResume(r);
     setResumes(fileStorage.listResumes());
   };
-  const markNotifsRead = () => {
+  const markNotifsRead = async () => {
     api.notifs.markAll();
-    setNotifs(api.notifs.list());
+    setNotifs(await api.notifs.list());
   };
   const resetAll = () => {
     api.resetAll();

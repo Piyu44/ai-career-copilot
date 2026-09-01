@@ -31,7 +31,7 @@ export default function CoverLetterPage() {
   const [tone, setTone] = useState<LetterTone>("Professional");
   const [working, setWorking] = useState(false);
   const [letter, setLetter] = useState<{ subject: string; letter: string } | null>(null);
-  const [history, setHistory] = useState<any[]>(api.covers.list());
+  const [history, setHistory] = useState<any[]>([]);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -46,6 +46,10 @@ export default function CoverLetterPage() {
     } else if (resumes[0]) {
       setResumeText(resumes[0].text);
     }
+    
+    // Load history
+    api.covers.list().then(setHistory).catch(console.error);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -61,8 +65,8 @@ export default function CoverLetterPage() {
     try {
       const res = await generateCoverLetter({ resumeText, company: company.trim(), jobTitle: position.trim(), tone, jobDescription: jdText || undefined });
       setLetter(res);
-      api.covers.add({ ...res, company: company.trim(), position: position.trim(), tone, createdAt: new Date().toISOString() });
-      setHistory(api.covers.list());
+      await api.covers.add({ ...res, company: company.trim(), position: position.trim(), tone, createdAt: new Date().toISOString() });
+      setHistory(await api.covers.list());
       if (!silent) toast({ title: "Cover letter generated", desc: `${tone} tone · ${res.letter.split(/\s+/).length} words`, tone: "success" });
     } catch (e: any) {
       toast({ title: "Generation failed", desc: e?.message, tone: "error" });
