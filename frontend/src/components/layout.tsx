@@ -121,7 +121,7 @@ export function Footer() {
             Find It · Apply It · Get It — AI Career Copilot to analyze, improve, and personalize every application to land your dream job.
           </p>
           <Badge tone="brand" className="mt-4">
-            <span className="h-1.5 w-1.5 animate-pulse-soft rounded-full bg-orange-400 shadow-[0_0_8px_rgba(249,115,22,.9)]" /> Demo mode · no AI key required
+            <span className="h-1.5 w-1.5 animate-pulse-soft rounded-full bg-orange-400 shadow-[0_0_8px_rgba(249,115,22,.9)]" /> AI Career Engine · Active
           </Badge>
         </div>
         {[

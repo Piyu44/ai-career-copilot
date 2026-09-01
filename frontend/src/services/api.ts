@@ -239,10 +239,94 @@ export const fileStorage = {
     if (!okType) throw new Error(`Unsupported file type. Accepted: ${this.ACCEPTED.join(", ")}`);
     if (size > this.MAX_MB * 1024 * 1024) throw new Error(`File exceeds ${this.MAX_MB}MB limit.`);
   },
-  /** Reads plain text; for PDF/DOCX the demo flags the file for paste fallback
-      (real parsing runs server-side via the storage service). */
+  /** Extracts text from PDF, DOCX, TXT, and MD files */
   async readText(file: File): Promise<string | null> {
-    if (/\.(txt|md)$/i.test(file.name)) return await file.text();
+    try {
+      // 1. Plain text & markdown files
+      if (/\.(txt|md|csv|rtf|json)$/i.test(file.name)) {
+        return await file.text();
+      }
+
+      // 2. Word documents (.docx)
+      if (/\.docx$/i.test(file.name)) {
+        const buffer = await file.arrayBuffer();
+        const decoder = new TextDecoder("utf-8", { fatal: false });
+        const raw = decoder.decode(buffer);
+
+        const matches = raw.match(/<w:t[^>]*>([^<]+)<\/w:t>/g);
+        if (matches && matches.length > 0) {
+          const text = matches
+            .map((m) => m.replace(/<w:t[^>]*>/, "").replace(/<\/w:t>/, ""))
+            .join(" ");
+          if (text.trim().length > 20) {
+            return text.replace(/\s+/g, " ").trim();
+          }
+        }
+      }
+
+      // 3. PDF documents (.pdf)
+      if (/\.pdf$/i.test(file.name)) {
+        const buffer = await file.arrayBuffer();
+        const bytes = new Uint8Array(buffer);
+        const decoder = new TextDecoder("latin1");
+        const raw = decoder.decode(bytes);
+
+        const extracted: string[] = [];
+
+        // Match PDF text strings: (Text chunk) Tj / ' / "
+        const tjMatches = raw.match(/\(([^()]{2,})\)\s*(?:Tj|'|")/g);
+        if (tjMatches) {
+          tjMatches.forEach((m) => {
+            const clean = m.replace(/\)\s*(?:Tj|'|")$/, "").replace(/^\(/, "");
+            if (clean.length > 1 && !clean.includes("\\x")) {
+              extracted.push(clean);
+            }
+          });
+        }
+
+        // Match PDF array text strings: [(chunk1) (chunk2)] TJ
+        const arrayMatches = raw.match(/\[\s*(?:\([^()]+\)\s*[-0-9\s]*)+\s*\]\s*TJ/g);
+        if (arrayMatches) {
+          arrayMatches.forEach((m) => {
+            const inner = m.match(/\(([^()]+)\)/g);
+            if (inner) {
+              const line = inner.map((s) => s.slice(1, -1)).join("");
+              if (line.length > 1) extracted.push(line);
+            }
+          });
+        }
+
+        if (extracted.length > 4) {
+          const cleanedText = extracted
+            .join(" ")
+            .replace(/\\([()\\])/g, "$1")
+            .replace(/\s+/g, " ")
+            .trim();
+          if (cleanedText.length > 30) {
+            return cleanedText;
+          }
+        }
+
+        // Fallback: extract continuous ASCII word streams from PDF
+        const words = raw.match(/[A-Za-z0-9,.:;@/+\-()]{3,}/g);
+        if (words && words.length > 20) {
+          const pdfKeywords = new Set(["obj", "endobj", "stream", "endstream", "xref", "trailer", "startxref", "Font", "Type", "Page", "Pages", "Catalog", "Length", "Filter", "FlateDecode", "MediaBox", "Contents", "Resources"]);
+          const filtered = words.filter((w) => !pdfKeywords.has(w));
+          if (filtered.length > 15) {
+            return filtered.join(" ");
+          }
+        }
+      }
+
+      // 4. Universal fallback text extraction
+      const rawText = await file.text();
+      const cleanAscii = rawText.replace(/[^\x20-\x7E\n\r\t]/g, " ").replace(/\s+/g, " ").trim();
+      if (cleanAscii.length > 50) {
+        return cleanAscii;
+      }
+    } catch (err) {
+      console.warn("Client-side text extraction notice:", err);
+    }
     return null;
   },
   saveResume(resume: StoredResume): StoredResume {

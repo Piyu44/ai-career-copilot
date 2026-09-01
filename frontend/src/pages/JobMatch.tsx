@@ -87,9 +87,9 @@ export default function JobMatch() {
       toast({ title: "Resume loaded", desc: `${f.name} · ${Math.round(f.size / 1024)} KB`, tone: "success" });
     } else {
       toast({
-        title: "Paste needed in demo mode",
-        desc: "PDF/DOCX text extraction runs on the backend in production. For now, paste your resume text.",
-        tone: "warning",
+        title: "Could not read file text",
+        desc: "Please paste your resume text directly into the text box or upload a text-based PDF/DOCX.",
+        tone: "info",
       });
       setTab("paste");
     }

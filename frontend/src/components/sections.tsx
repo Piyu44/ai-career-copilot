@@ -234,8 +234,8 @@ export function UpgradeModal({ open, onClose, need }: { open: boolean; onClose: 
           </div>
         ))}
       </div>
-      <p className="mt-4 rounded-lg bg-amber-400/10 px-3.5 py-2.5 text-xs font-medium leading-relaxed text-amber-300 ring-1 ring-amber-400/25">
-        Payments (UPI / cards / netbanking) connect at launch — no charge is made in demo mode and there is no fake checkout.
+      <p className="mt-4 rounded-lg bg-orange-400/10 px-3.5 py-2.5 text-xs font-medium leading-relaxed text-orange-300 ring-1 ring-orange-400/25">
+        Secure payment processing via Razorpay (UPI, Google Pay, Cards, NetBanking).
       </p>
       <div className="mt-5 flex justify-end gap-2">
         <Button variant="secondary" onClick={onClose}>Not now</Button>
