@@ -8,7 +8,8 @@ import {
 import { Badge, Bar, Button, Card, Cube, Orb, Ring3D, SceneShapes, ScoreRing, SkillChip, TiltCard } from "../components/ui";
 import { TrendArea } from "../components/charts";
 import { FinalCta, FaqSection, PricingSection, SectionHead } from "../components/sections";
-import { useReveal, usePageMeta } from "../hooks";
+import { useReveal } from "../hooks";
+import { SEO } from "../components/SEO";
 import { COMPANY_CHIPS } from "../data";
 import { useAuth } from "../context";
 import { cn } from "../utils";
@@ -557,12 +558,12 @@ function TrackerShowcase() {
 /* --------------------------------- landing --------------------------------- */
 
 export default function Landing() {
-  usePageMeta(
-    "JOB ASAP — AI Resume Builder & Career Copilot",
-    "Upload your resume, paste a job description, and let JOB ASAP analyze your match, improve your resume, write cover letters and run mock interviews."
-  );
   return (
     <>
+      <SEO 
+        title="Home"
+        description="Upload your resume, paste a job description, and let JOB ASAP analyze your match, improve your resume, write cover letters and run mock interviews."
+      />
       <Hero />
       <CompanyMarquee />
       <HowItWorks />

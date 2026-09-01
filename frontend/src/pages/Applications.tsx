@@ -4,14 +4,13 @@ import {
 } from "lucide-react";
 import { Badge, Button, Card, Confirm, EmptyState, Field, Input, Modal, PageHeader, Select, Skeleton, StatCard, Textarea, Tip } from "../components/ui";
 import { useData, useToast } from "../context";
-import { usePageMeta } from "../hooks";
+import { SEO } from "../components/SEO";
 import { APP_STATUSES, STATUS_META, type AppStatus } from "../data";
 import { cn, formatDate, uid } from "../utils";
 
 const emptyForm = { company: "", role: "", location: "", dateApplied: new Date().toISOString().slice(0, 10), status: "Applied" as AppStatus, nextStep: "", notes: "" };
 
 export default function ApplicationsPage() {
-  usePageMeta("Application Tracker — JOB ASAP", "Track every application through saved, applied, screening, interview, offer and rejected stages.");
   const { applications, loading, upsertApplication, removeApplication } = useData();
   const { toast } = useToast();
 
@@ -86,6 +85,10 @@ export default function ApplicationsPage() {
 
   return (
     <div className="animate-fade-up">
+      <SEO 
+        title="Application Tracker"
+        description="Track every application through saved, applied, screening, interview, offer and rejected stages."
+      />
       <PageHeader
         eyebrow="Application Tracker"
         title="Applications"
