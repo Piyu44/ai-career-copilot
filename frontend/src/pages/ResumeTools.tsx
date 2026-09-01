@@ -358,7 +358,7 @@ export function AtsCheckerPage() {
       {result && !working && (
         <div className="mt-6 space-y-6">
           <div className="rounded-xl bg-amber-50 px-4 py-3 text-[13px] font-semibold text-amber-800 ring-1 ring-amber-200">
-            ⚖️ This is CareerDost's assessment of your resume — not a score from any employer's ATS.
+            ⚖️ This is JOB ASAP's assessment of your resume — not a score from any employer's ATS.
           </div>
           <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
             <Card className="flex flex-col items-center p-7">

@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import { FirebaseUser } from "../services/firebaseUser.js";
 import { AppError } from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
@@ -10,12 +10,12 @@ export const protect = asyncHandler(async (req, _res, next) => {
 
   let payload;
   try {
-    payload = jwt.verify(header.slice(7), process.env.JWT_SECRET);
+    payload = jwt.verify(header.slice(7), process.env.JWT_SECRET || "default_jwt_secret");
   } catch {
     throw new AppError("Session expired — log in again.", 401);
   }
 
-  const user = await User.findById(payload.sub);
+  const user = await FirebaseUser.findById(payload.sub);
   if (!user) throw new AppError("Account no longer exists.", 401);
   req.user = user;
   next();
@@ -29,3 +29,8 @@ export const requirePlan =
       return next(new AppError(`This feature needs the ${plans[0]} plan or above.`, 403));
     next();
   };
+
+export default {
+  protect,
+  requirePlan,
+};

@@ -1,6 +1,5 @@
-import User from "../models/User.js";
-import Usage from "../models/Usage.js";
-import Subscription from "../models/Subscription.js";
+import { FirebaseUser } from "../services/firebaseUser.js";
+import { FirebaseUsage, FirebaseSubscription } from "../services/firebaseModels.js";
 import { PLANS } from "../config/plans.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
@@ -12,22 +11,22 @@ export const getProfile = asyncHandler(async (req, res) => {
 /** PUT /api/user/profile — name/email only; plan changes go through billing */
 export const updateProfile = asyncHandler(async (req, res) => {
   const { name, email } = req.body;
-  const user = await User.findByIdAndUpdate(
-    req.user._id,
-    { ...(name && { name }), ...(email && { email: email.toLowerCase() }) },
-    { new: true, runValidators: true }
+  const user = await FirebaseUser.findByIdAndUpdate(
+    req.user._id || req.user.id,
+    { ...(name && { name }), ...(email && { email: email.toLowerCase() }) }
   );
   res.json(user.toSafeJSON());
 });
 
 /** GET /api/user/usage — credit ledger */
 export const getUsage = asyncHandler(async (req, res) => {
-  res.json(await Usage.find({ userId: req.user._id }).sort("-createdAt").limit(60).lean());
+  const list = await FirebaseUsage.find({ userId: req.user._id || req.user.id });
+  res.json(list.slice(0, 60));
 });
 
-/** GET /api/user/subscription — plan + catalogue (prices served, never hard-coded in UI) */
+/** GET /api/user/subscription — plan + catalogue */
 export const getSubscription = asyncHandler(async (req, res) => {
-  const sub = await Subscription.findOne({ userId: req.user._id }).lean();
+  const sub = await FirebaseSubscription.findOne({ userId: req.user._id || req.user.id });
   res.json({
     plans: PLANS,
     current: {
@@ -37,3 +36,10 @@ export const getSubscription = asyncHandler(async (req, res) => {
     },
   });
 });
+
+export default {
+  getProfile,
+  updateProfile,
+  getUsage,
+  getSubscription,
+};

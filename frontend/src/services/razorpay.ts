@@ -225,9 +225,9 @@ export async function launchRazorpayCheckout({
       key: rawKey || order?.key_id,
       amount: order?.amount || amountInPaise,
       currency: order?.currency || "INR",
-      name: "CareerDost",
+      name: "JOB ASAP",
       description: `${plan.name} Plan (${billing === "monthly" ? "Monthly" : "Yearly"}) — ${plan.credits} Credits`,
-      image: "https://cdn-icons-png.flaticon.com/512/8644/8644421.png",
+      image: typeof window !== "undefined" ? `${window.location.origin}/logo.png` : "/logo.png",
       prefill: {
         name: user.name || "Career Seeker",
         email: user.email || "user@example.com",

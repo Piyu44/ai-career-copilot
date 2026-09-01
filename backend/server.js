@@ -4,7 +4,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
-import { connectDB } from "./config/db.js";
+import { initializeFirebase } from "./config/firebase.js";
 import routes from "./routes/index.js";
 import { notFound, errorHandler } from "./middleware/error.js";
 
@@ -14,27 +14,34 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN?.split(",") ?? "http://localhost:5173",
+    origin: process.env.CLIENT_ORIGIN?.split(",") ?? ["http://localhost:3000", "http://localhost:5173"],
     credentials: true,
   })
 );
-app.use(express.json({ limit: "1mb" })); // hard input-size limit
+app.use(express.json({ limit: "2mb" }));
 if (process.env.NODE_ENV !== "production") app.use(morgan("dev"));
 
 /* Rate limiting — stricter on auth to blunt credential stuffing */
 app.use(
   "/api/auth",
-  rateLimit({ windowMs: 15 * 60 * 1000, max: 30, standardHeaders: true, legacyHeaders: false })
+  rateLimit({ windowMs: 15 * 60 * 1000, max: 60, standardHeaders: true, legacyHeaders: false })
 );
 app.use(
   "/api",
-  rateLimit({ windowMs: 60 * 1000, max: 120, standardHeaders: true, legacyHeaders: false })
+  rateLimit({ windowMs: 60 * 1000, max: 180, standardHeaders: true, legacyHeaders: false })
 );
 
 /* -------------------------------- routes -------------------------------- */
 app.get("/api/health", (_req, res) =>
-  res.json({ ok: true, service: "careerdost-api", mockAi: process.env.USE_MOCK_AI !== "false" })
+  res.json({
+    ok: true,
+    service: "job-asap-ai-api",
+    status: "healthy",
+    mockAi: process.env.USE_MOCK_AI !== "false",
+    paymentGateway: process.env.PAYMENT_GATEWAY || "razorpay",
+  })
 );
+
 app.use("/api", routes);
 
 /* --------------------------- error handling ------------------------------ */
@@ -43,8 +50,13 @@ app.use(errorHandler);
 
 /* -------------------------------- start ---------------------------------- */
 const PORT = process.env.PORT || 5000;
-connectDB().then(() => {
-  app.listen(PORT, () =>
-    console.log(`✅ CareerDost AI API listening on :${PORT} (mock AI: ${process.env.USE_MOCK_AI !== "false"})`)
-  );
+
+initializeFirebase().then(() => {
+  app.listen(PORT, () => {
+    console.log(`✅ JOB ASAP AI API listening on port ${PORT}`);
+    console.log(`   - AI Engine: ${process.env.USE_MOCK_AI !== "false" ? "Mock Engine" : process.env.AI_PROVIDER || "Gemini"}`);
+    console.log(`   - Payment Gateway: Razorpay Active`);
+  });
 });
+
+export default app;

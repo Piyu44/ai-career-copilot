@@ -3,8 +3,8 @@ import { getRazorpayClient } from "../config/razorpay.js";
 import { PLANS } from "../config/plans.js";
 import { AppError } from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import User from "../models/User.js";
-import Subscription from "../models/Subscription.js";
+import { FirebaseUser } from "../services/firebaseUser.js";
+import { FirebaseSubscription } from "../services/firebaseModels.js";
 
 /**
  * POST /api/create-order
@@ -50,8 +50,7 @@ export const createOrder = asyncHandler(async (req, res) => {
   } catch (error) {
     console.error("Razorpay order creation error:", error);
 
-    // Auth error with Razorpay API
-    if (error.statusCode === 401 || error?.error?.code === "BAD_REQUEST_ERROR" && error?.error?.description?.includes("key")) {
+    if (error.statusCode === 401 || (error?.error?.code === "BAD_REQUEST_ERROR" && error?.error?.description?.includes("key"))) {
       return res.status(401).json({
         success: false,
         error: "Razorpay authentication failed. Verify API Key and Secret.",
@@ -123,7 +122,7 @@ export const verifyPayment = asyncHandler(async (req, res) => {
   }
 
   // 3. Update database entitlements if a user ID is present
-  const targetUserId = req.user?._id || userId;
+  const targetUserId = req.user?._id || req.user?.id || userId;
   let userUpdated = false;
   let updatedCredits = 0;
 
@@ -132,7 +131,7 @@ export const verifyPayment = asyncHandler(async (req, res) => {
       const selectedPlan = PLANS[planId] || PLANS.pro;
       const creditsToAdd = selectedPlan.creditsMonthly || selectedPlan.creditsOnSignup || 100;
 
-      const user = await User.findById(targetUserId);
+      const user = await FirebaseUser.findById(targetUserId);
       if (user) {
         user.plan = planId || "pro";
         user.credits = (user.credits || 0) + creditsToAdd;
@@ -140,7 +139,7 @@ export const verifyPayment = asyncHandler(async (req, res) => {
         updatedCredits = user.credits;
         userUpdated = true;
 
-        await Subscription.findOneAndUpdate(
+        await FirebaseSubscription.findOneAndUpdate(
           { userId: user._id },
           {
             plan: user.plan,
@@ -156,7 +155,7 @@ export const verifyPayment = asyncHandler(async (req, res) => {
         );
       }
     } catch (dbErr) {
-      console.warn("Database user update optional step:", dbErr.message);
+      console.warn("Database user update step note:", dbErr.message);
     }
   }
 
@@ -171,3 +170,8 @@ export const verifyPayment = asyncHandler(async (req, res) => {
     credits: updatedCredits,
   });
 });
+
+export default {
+  createOrder,
+  verifyPayment,
+};

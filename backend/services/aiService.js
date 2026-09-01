@@ -3,7 +3,7 @@
  * -----------------------------------------
  * Controllers call these functions; the provider is chosen by env config:
  *   USE_MOCK_AI=true  → services/providers/mockProvider.js (deterministic demo)
- *   USE_MOCK_AI=false → AI_PROVIDER adapter (openai today; add anthropic/gemini)
+ *   USE_MOCK_AI=false → AI_PROVIDER adapter (groq, gemini, openai)
  *
  * Every provider must return the SAME structured JSON shapes, and every
  * response is validated here before reaching the client.
@@ -12,32 +12,53 @@
  * but must NEVER invent experience, employers, degrees or achievements.
  */
 import { mockProvider } from "./providers/mockProvider.js";
-import { openaiProvider } from "./providers/openaiProvider.js";
+import { groqProvider } from "./providers/groqProvider.js";
 import { geminiProvider } from "./providers/geminiProvider.js";
+import { openaiProvider } from "./providers/openaiProvider.js";
 import { AppError } from "../utils/AppError.js";
 
 function getProvider() {
   if (process.env.USE_MOCK_AI === "false") {
     const provider = (process.env.AI_PROVIDER || "").toLowerCase();
 
-    // Auto-detect or explicit choice
-    if (provider === "gemini" || process.env.GEMINI_API_KEY || (process.env.AI_API_KEY && process.env.AI_API_KEY.startsWith("AIza"))) {
+    // 1. Groq (Ultra-fast inference via Groq Cloud)
+    if (
+      provider === "groq" ||
+      process.env.GROQ_API_KEY ||
+      (process.env.AI_API_KEY && process.env.AI_API_KEY.startsWith("gsk_"))
+    ) {
+      const key = process.env.GROQ_API_KEY || process.env.AI_API_KEY;
+      if (!key) throw new AppError("GROQ_API_KEY missing in backend/.env — set it or run with USE_MOCK_AI=true.", 503);
+      return groqProvider;
+    }
+
+    // 2. Gemini
+    if (
+      provider === "gemini" ||
+      process.env.GEMINI_API_KEY ||
+      (process.env.AI_API_KEY && process.env.AI_API_KEY.startsWith("AIza"))
+    ) {
       const key = process.env.GEMINI_API_KEY || process.env.AI_API_KEY;
-      if (!key) throw new AppError("GEMINI_API_KEY missing — set it or run with USE_MOCK_AI=true.", 503);
+      if (!key) throw new AppError("GEMINI_API_KEY missing in backend/.env — set it or run with USE_MOCK_AI=true.", 503);
       return geminiProvider;
     }
 
-    if (provider === "openai" || process.env.OPENAI_API_KEY || (process.env.AI_API_KEY && process.env.AI_API_KEY.startsWith("sk-"))) {
+    // 3. OpenAI
+    if (
+      provider === "openai" ||
+      process.env.OPENAI_API_KEY ||
+      (process.env.AI_API_KEY && process.env.AI_API_KEY.startsWith("sk-"))
+    ) {
       const key = process.env.OPENAI_API_KEY || process.env.AI_API_KEY;
       if (!key) throw new AppError("OPENAI_API_KEY / AI_API_KEY missing — set it or run with USE_MOCK_AI=true.", 503);
       return openaiProvider;
     }
 
-    // Default to gemini if provider set to gemini, or openai
+    if (provider === "groq") return groqProvider;
     if (provider === "gemini") return geminiProvider;
     if (provider === "openai") return openaiProvider;
 
-    throw new AppError(`Unknown or unconfigured AI_PROVIDER: ${process.env.AI_PROVIDER}. Use 'gemini' or 'openai'.`, 500);
+    throw new AppError(`Unknown or unconfigured AI_PROVIDER: ${process.env.AI_PROVIDER}. Supported: 'groq', 'gemini', 'openai'.`, 500);
   }
   return mockProvider;
 }
@@ -93,3 +114,12 @@ export async function atsCheck({ resumeText, jobDescription }) {
   if (typeof result?.score !== "number") throw new AppError("AI returned an invalid ATS report.", 502);
   return { ...result, score: clamp(result.score, 1, 100) };
 }
+
+export default {
+  analyzeJobMatch,
+  improveResume,
+  generateCoverLetter,
+  generateInterviewQuestions,
+  evaluateInterviewAnswer,
+  atsCheck,
+};

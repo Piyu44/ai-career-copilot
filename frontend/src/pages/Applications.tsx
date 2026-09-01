@@ -11,7 +11,7 @@ import { cn, formatDate, uid } from "../utils";
 const emptyForm = { company: "", role: "", location: "", dateApplied: new Date().toISOString().slice(0, 10), status: "Applied" as AppStatus, nextStep: "", notes: "" };
 
 export default function ApplicationsPage() {
-  usePageMeta("Application Tracker — CareerDost AI", "Track every application through saved, applied, screening, interview, offer and rejected stages.");
+  usePageMeta("Application Tracker — JOB ASAP", "Track every application through saved, applied, screening, interview, offer and rejected stages.");
   const { applications, loading, upsertApplication, removeApplication } = useData();
   const { toast } = useToast();
 

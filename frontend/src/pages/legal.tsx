@@ -5,7 +5,7 @@ import { Card, Badge, Button } from "../components/ui";
 import { usePageMeta } from "../hooks";
 
 export function TermsPage() {
-  usePageMeta("Terms & Conditions — CareerDost AI");
+  usePageMeta("Terms & Conditions — JOB ASAP");
   return (
     <div className="container-x py-16">
       <div className="mx-auto max-w-3xl">
@@ -19,7 +19,7 @@ export function TermsPage() {
           <Card className="p-6">
             <h2 className="font-display text-lg font-bold text-white mb-2">1. Acceptance of Terms</h2>
             <p>
-              By accessing or using CareerDost ("Service"), you agree to be bound by these Terms of Service.
+              By accessing or using JOB ASAP ("Service"), you agree to be bound by these Terms of Service.
               If you do not agree to these terms, please do not use our services.
             </p>
           </Card>
@@ -27,7 +27,7 @@ export function TermsPage() {
           <Card className="p-6">
             <h2 className="font-display text-lg font-bold text-white mb-2">2. Description of Service</h2>
             <p>
-              CareerDost provides AI-assisted resume analysis, job match scoring, cover letter generation, and interview simulation tools.
+              JOB ASAP provides AI-assisted resume analysis, job match scoring, cover letter generation, and interview simulation tools.
               Scores and suggestions generated are advisory and for personal career preparation.
             </p>
           </Card>
@@ -53,7 +53,7 @@ export function TermsPage() {
 }
 
 export function PrivacyPolicyPage() {
-  usePageMeta("Privacy Policy — CareerDost AI");
+  usePageMeta("Privacy Policy — JOB ASAP");
   return (
     <div className="container-x py-16">
       <div className="mx-auto max-w-3xl">
@@ -93,7 +93,7 @@ export function PrivacyPolicyPage() {
 }
 
 export function RefundPolicyPage() {
-  usePageMeta("Cancellation & Refund Policy — CareerDost AI");
+  usePageMeta("Cancellation & Refund Policy — JOB ASAP");
   return (
     <div className="container-x py-16">
       <div className="mx-auto max-w-3xl">
@@ -121,7 +121,7 @@ export function RefundPolicyPage() {
           <Card className="p-6">
             <h2 className="font-display text-lg font-bold text-white mb-2">3. Processing Refunds</h2>
             <p>
-              Refund requests can be submitted to our support team at <strong className="text-white">support@careerdost.in</strong> with your Razorpay Payment ID.
+              Refund requests can be submitted to our support team at <strong className="text-white">support@jobasap.in</strong> with your Razorpay Payment ID.
               Approved refunds are credited back to the original payment source within 5–7 working days per standard banking processing timelines.
             </p>
           </Card>
@@ -132,7 +132,7 @@ export function RefundPolicyPage() {
 }
 
 export function ContactUsPage() {
-  usePageMeta("Contact Us — CareerDost AI");
+  usePageMeta("Contact Us — JOB ASAP");
   return (
     <div className="container-x py-16">
       <div className="mx-auto max-w-3xl">
@@ -150,8 +150,8 @@ export function ContactUsPage() {
             <div>
               <h3 className="font-display font-bold text-white">Email Support</h3>
               <p className="mt-1 text-xs text-ink-400">Response within 24 hours</p>
-              <a href="mailto:support@careerdost.in" className="mt-2 inline-block text-sm font-semibold text-brand-300 hover:underline">
-                support@careerdost.in
+              <a href="mailto:support@jobasap.in" className="mt-2 inline-block text-sm font-semibold text-brand-300 hover:underline">
+                support@jobasap.in
               </a>
             </div>
           </Card>
@@ -162,7 +162,7 @@ export function ContactUsPage() {
             </div>
             <div>
               <h3 className="font-display font-bold text-white">Headquarters</h3>
-              <p className="mt-1 text-xs text-ink-400">CareerDost India</p>
+              <p className="mt-1 text-xs text-ink-400">JOB ASAP India</p>
               <p className="mt-2 text-sm text-ink-300">Bengaluru, Karnataka, India</p>
             </div>
           </Card>
@@ -171,3 +171,10 @@ export function ContactUsPage() {
     </div>
   );
 }
+
+export default {
+  TermsPage,
+  PrivacyPolicyPage,
+  RefundPolicyPage,
+  ContactUsPage,
+};

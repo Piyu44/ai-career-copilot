@@ -13,7 +13,7 @@ import { DEMO_ACCOUNT } from "../services/api";
 import { cn, formatDate, timeAgo } from "../utils";
 
 export default function SettingsPage() {
-  usePageMeta("Settings — CareerDost AI");
+  usePageMeta("Settings — JOB ASAP");
   const { user, updateUser, usage, logout, sendVerificationEmail, checkEmailVerified } = useAuth();
   const { resetAll } = useData();
   const { toast } = useToast();
@@ -208,8 +208,8 @@ export default function SettingsPage() {
                 <Badge tone={IS_MOCK_AI ? "amber" : "emerald"}>{IS_MOCK_AI ? "Mock engine (demo)" : "Live provider"}</Badge>
               </div>
               <div className="flex items-center justify-between rounded-lg bg-ink-50/70 px-3.5 py-2.5">
-                <span className="text-ink-600">Backend API</span>
-                <Badge tone="ink">Express + MongoDB (connects at deploy)</Badge>
+                <span className="text-ink-600">Database & Auth</span>
+                <Badge tone="emerald">Firebase RTDB & Auth · Active</Badge>
               </div>
               <div className="flex items-center justify-between rounded-lg bg-ink-50/70 px-3.5 py-2.5">
                 <span className="text-ink-600">Payments</span>

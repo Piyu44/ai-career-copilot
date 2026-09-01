@@ -101,7 +101,7 @@ const FEATURE_ROWS = [
 ];
 
 export function FeaturesPage() {
-  usePageMeta("Features — CareerDost AI", "Job match analysis, resume improvement, cover letters, interview simulator, ATS checker and application tracking.");
+  usePageMeta("Features — JOB ASAP", "Job match analysis, resume improvement, cover letters, interview simulator, ATS checker and application tracking.");
   return (
     <>
       <section className="relative overflow-hidden">
@@ -161,7 +161,7 @@ export function FeaturesPage() {
 /* ================================ PRICING ================================ */
 
 export function PricingPage() {
-  usePageMeta("Pricing — CareerDost AI", "Free, Starter ₹199 and Pro ₹499 plans with transparent credit costs for every AI action.");
+  usePageMeta("Pricing — JOB ASAP", "Free, Starter ₹199 and Pro ₹499 plans with transparent credit costs for every AI action.");
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
   return (
     <>
@@ -283,7 +283,7 @@ const EMAIL_RE = /^[\w.+-]+@[\w-]+\.[\w.]+$/;
 const formError = "mb-4 rounded-lg bg-rose-400/10 px-4 py-3 text-sm font-semibold text-rose-300 ring-1 ring-rose-400/25";
 
 export function LoginPage() {
-  usePageMeta("Log in — CareerDost AI");
+  usePageMeta("Log in — JOB ASAP");
   const { login } = useAuth();
   const { toast } = useToast();
   const nav = useNavigate();
@@ -302,7 +302,7 @@ export function LoginPage() {
     setLoading(true);
     try {
       const u = await login(em, p);
-      toast({ title: `Welcome back, ${u.name.split(" ")[0]}!`, desc: "Your CareerDost AI is ready to help.", tone: "success" });
+      toast({ title: `Welcome back, ${u.name.split(" ")[0]}!`, desc: "Your JOB ASAP AI is ready to help.", tone: "success" });
       nav("/dashboard");
     } catch (err: any) {
       setErrors({ form: err.message });
@@ -347,7 +347,7 @@ export function LoginPage() {
 }
 
 export function RegisterPage() {
-  usePageMeta("Create account — CareerDost AI", "Sign up free with 10 credits. No card required.");
+  usePageMeta("Create account — JOB ASAP", "Sign up free with 10 credits. No card required.");
   const { register } = useAuth();
   const { toast } = useToast();
   const nav = useNavigate();
@@ -413,7 +413,7 @@ export function RegisterPage() {
 const successPanel = "rounded-xl bg-emerald-400/10 p-5 text-center ring-1 ring-emerald-400/25 animate-pop-in";
 
 export function ForgotPasswordPage() {
-  usePageMeta("Reset password — CareerDost AI");
+  usePageMeta("Reset password — JOB ASAP");
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
@@ -464,7 +464,7 @@ export function ForgotPasswordPage() {
 }
 
 export function ResetPasswordPage() {
-  usePageMeta("Set new password — CareerDost AI");
+  usePageMeta("Set new password — JOB ASAP");
   const [pw, setPw] = useState("");
   const [confirm, setConfirm] = useState("");
   const [done, setDone] = useState(false);
@@ -493,7 +493,7 @@ export function ResetPasswordPage() {
 /* ================================== 404 =================================== */
 
 export function NotFoundPage() {
-  usePageMeta("Page not found — CareerDost AI");
+  usePageMeta("Page not found — JOB ASAP");
   return (
     <div className="relative flex min-h-[70vh] items-center justify-center overflow-hidden py-24">
       <div className="absolute inset-0 bg-grid-dark [mask-image:radial-gradient(60%_60%_at_50%_50%,black,transparent)]" />

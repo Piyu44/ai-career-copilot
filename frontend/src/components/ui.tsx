@@ -611,19 +611,26 @@ export const Stepper = ({ steps, current }: { steps: string[]; current: number }
 
 /* ---------------------------------- Logo ---------------------------------- */
 
-export const Logo = ({ light = true, small = false }: { light?: boolean; small?: boolean }) => (
+export const Logo = ({ light = true, small = false, showTagline = false }: { light?: boolean; small?: boolean; showTagline?: boolean }) => (
   <span className="inline-flex items-center gap-2.5">
-    <span className={cn(
-      "flex items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-800 shadow-[inset_0_1px_0_rgba(255,255,255,.4),0_8px_20px_-6px_rgba(139,92,246,.7)]",
-      small ? "h-8 w-8" : "h-9 w-9"
-    )}>
-      <svg viewBox="0 0 24 24" fill="none" className={small ? "h-4 w-4" : "h-5 w-5"}>
-        <path d="M13 2 5 14h5.5L11 22l8-12h-5.5L13 2Z" fill="#fff" />
-      </svg>
-    </span>
-    <span className={cn("font-display font-bold leading-tight", small ? "text-[15px]" : "text-[17px]", "text-white")}>
-      Career<span className="text-brand-300">Dost</span>
-      <span className="ml-1.5 rounded-md bg-brand-500/20 px-1.5 py-0.5 text-[10px] font-bold text-brand-300 ring-1 ring-brand-400/30">AI</span>
+    <img
+      src="/logo.png"
+      alt="JOB ASAP Logo"
+      className={cn(
+        "rounded-xl object-cover shadow-[0_4px_16px_rgba(249,115,22,0.3)] ring-1 ring-white/20 transition-transform duration-300 hover:scale-105",
+        small ? "h-8 w-8" : "h-9 w-9"
+      )}
+    />
+    <span className="flex flex-col">
+      <span className={cn("font-display font-black leading-tight tracking-tight flex items-center", small ? "text-[15px]" : "text-[17px]", "text-white")}>
+        JOB<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 ml-1">ASAP</span>
+        <span className="ml-1.5 rounded-md bg-orange-500/20 px-1.5 py-0.5 text-[10px] font-bold text-orange-300 ring-1 ring-orange-400/30">AI</span>
+      </span>
+      {showTagline && (
+        <span className="text-[9px] font-bold tracking-widest text-ink-400 uppercase -mt-0.5">
+          Find it · Apply it · Get it
+        </span>
+      )}
     </span>
   </span>
 );

@@ -558,8 +558,8 @@ function TrackerShowcase() {
 
 export default function Landing() {
   usePageMeta(
-    "CareerDost — India's AI Resume Builder & Career Companion",
-    "Upload your resume, paste a job description, and let CareerDost AI analyze your match, improve your resume, write cover letters and run mock interviews."
+    "JOB ASAP — AI Resume Builder & Career Copilot",
+    "Upload your resume, paste a job description, and let JOB ASAP analyze your match, improve your resume, write cover letters and run mock interviews."
   );
   return (
     <>

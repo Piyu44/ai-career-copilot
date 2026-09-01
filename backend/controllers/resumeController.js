@@ -1,5 +1,5 @@
-import Resume from "../models/Resume.js";
-import GeneratedResume from "../models/GeneratedResume.js";
+import { FirebaseResume } from "../services/firebaseResume.js";
+import { FirebaseGeneratedResume } from "../services/firebaseModels.js";
 import * as aiService from "../services/aiService.js";
 import * as creditService from "../services/creditService.js";
 import { storageService } from "../services/storageService.js";
@@ -12,21 +12,22 @@ export const uploadResume = asyncHandler(async (req, res) => {
   const key = `resumes/${req.user._id}/${req.file.filename}`;
   const { url } = await storageService.save(req.file, key);
 
-  const doc = await Resume.create({
+  const doc = await FirebaseResume.create({
     userId: req.user._id,
     name: req.body.name || req.file.originalname,
     fileName: req.file.originalname,
     mimeType: req.file.mimetype,
     sizeBytes: req.file.size,
     storageKey: key,
-    // TODO(parsing-pipeline): pdf/docx → text extraction worker fills extractedText
+    extractedText: req.body.extractedText || "",
   });
   res.status(201).json({ resume: doc, url });
 });
 
 /** GET /api/resume */
 export const listResumes = asyncHandler(async (req, res) => {
-  res.json(await Resume.find({ userId: req.user._id }).sort("-createdAt").lean());
+  const list = await FirebaseResume.find({ userId: req.user._id });
+  res.json(list);
 });
 
 /** POST /api/resume/improve */
@@ -36,7 +37,7 @@ export const improveResume = asyncHandler(async (req, res) => {
 
   await creditService.consumeCredits(req.user._id, "improve");
   const result = await aiService.improveResume({ resumeText, jobDescription, jobTitle, variant });
-  const doc = await GeneratedResume.create({ userId: req.user._id, ...result, variant });
+  const doc = await FirebaseGeneratedResume.create({ userId: req.user._id, ...result, variant });
   res.status(201).json(doc);
 });
 
@@ -47,3 +48,10 @@ export const atsCheck = asyncHandler(async (req, res) => {
   await creditService.consumeCredits(req.user._id, "ats");
   res.json(await aiService.atsCheck({ resumeText, jobDescription }));
 });
+
+export default {
+  uploadResume,
+  listResumes,
+  improveResume,
+  atsCheck,
+};

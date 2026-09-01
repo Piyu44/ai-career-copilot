@@ -1,6 +1,6 @@
-# AI Career Copilot — "Your AI Partner in Getting Hired"
+# JOB ASAP — "Your AI Partner in Getting Hired"
 
-A production-architected full-stack SaaS for Indian students, freshers, developers and job seekers.
+A production-architected full-stack SaaS for students, freshers, developers and job seekers.
 Upload a resume + paste a job description → match score, missing skills/keywords, improved resume,
 cover letter, AI mock interviews and an application tracker — all sharing one context.
 
@@ -10,50 +10,43 @@ cover letter, AI mock interviews and an application tracker — all sharing one 
 ├── frontend/                  ← ALL frontend code lives here
 │   └── src/
 │       ├── App.tsx            # router (lazy routes = code splitting)
-│       ├── components/        # ui kit · charts · layouts · shared sections
+│       ├── components/        # ui kit · charts · layouts · shared sections · Razorpay modal
 │       ├── pages/             # landing, features, pricing, auth, dashboard,
 │       │                      #   job-match, resume-tools, cover-letter,
 │       │                      #   interview, ats-checker, applications, settings
-│       ├── services/          # ai.ts (provider-independent) · api.ts (REST/demo adapter)
+│       ├── services/          # ai.ts · api.ts · firebase.ts · firebaseAuth.ts · razorpay.ts
 │       ├── context.tsx        # auth · data · toast providers
 │       ├── hooks.ts           # reveal, count-up, debounce, page meta
 │       ├── data.ts            # plans/pricing/credits config, skill graph, demo seeds
 │       └── utils.ts           # cn, downloads (real PDF/DOCX), helpers
 │
-├── backend/                   ← ALL backend code lives here (Express + MongoDB)
+├── backend/                   ← ALL backend code lives here (Express + Firebase + Razorpay + Groq/Gemini/OpenAI)
 │   ├── server.js              # helmet · cors · rate limits · routes
-│   ├── config/                # db.js · plans.js (single pricing source)
-│   ├── models/                # User · Resume · JobAnalysis · GeneratedResume ·
-│   │                          #   CoverLetter · Interview · Application · Usage · Subscription
+│   ├── config/                # firebase.js · razorpay.js · plans.js (single pricing source)
 │   ├── controllers/  routes/  middleware/  utils/
 │   └── services/
 │       ├── aiService.js       # facade: analyzeJobMatch · improveResume ·
 │       │                      #   generateCoverLetter · generateInterviewQuestions ·
 │       │                      #   evaluateInterviewAnswer · atsCheck
-│       ├── providers/         # mockProvider.js · openaiProvider.js
+│       ├── providers/         # groqProvider.js · geminiProvider.js · openaiProvider.js · mockProvider.js
+│       ├── firebaseUser.js    # User data adapter (Firebase Realtime DB / memory)
+│       ├── firebaseResume.js  # Resume data adapter
+│       ├── firebaseModels.js  # Subscription, Application, Usage, JobAnalysis adapters
 │       ├── creditService.js   # getUserCredits · consumeCredits · addCredits · hasEnoughCredits
 │       └── storageService.js  # local-disk today, S3 later — same interface
 │
 └── src/App.tsx                # thin entry bridge into frontend/ (build harness)
 ```
 
-## Demo mode
+## Database & Auth Architecture
 
-The shipped build runs with `USE_MOCK_AI=true`: a deterministic heuristic engine produces
-realistic structured analyses, so the full journey works with **no API key and no server**.
-Set `VITE_USE_MOCK_AI=false` to proxy to the backend, and `USE_MOCK_AI=false` + `AI_API_KEY`
-server-side to go live with a real provider. Keys never reach the browser.
+- **Authentication**: Firebase Authentication (Email/Password, Email Verification, Password Reset).
+- **Database**: Firebase Realtime Database with client and server adapters.
+- **Payments**: Razorpay Payment Gateway integration (Live / Test modes with HMAC-SHA256 signature verification).
+- **AI Providers**: Groq (LLaMA-3.3-70B), Google Gemini, OpenAI, and Heuristic Mock Engine.
 
 ## The user journey
 
 Landing → Register (10 free credits) → Dashboard → Upload resume → Paste JD →
 **Match score** → Missing skills/keywords → Improve resume → Cover letter →
-Mock interview → Track application → Upgrade plan (payment gateway wired at launch —
-no fake checkout in demo).
-
-## Guardrails baked in
-
-- Match/ATS scores are always labelled **internal assessments**, never employer ATS scores
-- The AI rewrites and suggests — it **never invents** experience, employers or degrees
-- Credits gate every AI action; insufficient balance → upgrade flow, never negative
-- Pricing, credit costs and plan entitlements are configured in one place per layer
+Mock interview → Track application → Upgrade plan (Razorpay gateway with UPI/Card/NetBanking).

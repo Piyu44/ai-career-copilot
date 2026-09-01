@@ -1,4 +1,4 @@
-import CoverLetter from "../models/CoverLetter.js";
+import { FirebaseCoverLetter } from "../services/firebaseModels.js";
 import * as aiService from "../services/aiService.js";
 import * as creditService from "../services/creditService.js";
 import { AppError } from "../utils/AppError.js";
@@ -11,11 +11,17 @@ export const generate = asyncHandler(async (req, res) => {
 
   await creditService.consumeCredits(req.user._id, "coverLetter", { company });
   const result = await aiService.generateCoverLetter({ resumeText, company, position, tone, jobDescription });
-  const doc = await CoverLetter.create({ userId: req.user._id, company, position, tone, jobDescription, ...result });
+  const doc = await FirebaseCoverLetter.create({ userId: req.user._id, company, position, tone, jobDescription, ...result });
   res.status(201).json(doc);
 });
 
 /** GET /api/cover-letter */
 export const list = asyncHandler(async (req, res) => {
-  res.json(await CoverLetter.find({ userId: req.user._id }).sort("-createdAt").limit(30).lean());
+  const list = await FirebaseCoverLetter.find({ userId: req.user._id });
+  res.json(list.slice(0, 30));
 });
+
+export default {
+  generate,
+  list,
+};
