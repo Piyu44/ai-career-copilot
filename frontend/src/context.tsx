@@ -242,12 +242,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(formatFirebaseError(res.error || "Login failed"));
     }
 
+    let dbCredits = 10;
+    let dbPlan: PlanId = "free";
+    let dbName = res.user.displayName || res.user.email?.split("@")[0] || "User";
+
+    try {
+      const snapshot = await get(ref(database, `users/${res.user.uid}`));
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        if (typeof data.credits === "number") dbCredits = data.credits;
+        if (data.plan) dbPlan = data.plan;
+        if (data.name) dbName = data.name;
+      }
+    } catch (dbErr) {
+      console.warn("Could not read user profile from Realtime DB on login:", dbErr);
+    }
+
     const u: PublicUser = {
       id: res.user.uid,
-      name: res.user.displayName || res.user.email?.split("@")[0] || "User",
+      name: dbName,
       email: res.user.email || email,
-      plan: "free",
-      credits: 10,
+      plan: dbPlan,
+      credits: dbCredits,
       createdAt: res.user.metadata.creationTime || new Date().toISOString(),
       emailVerified: res.user.emailVerified,
     };
