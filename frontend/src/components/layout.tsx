@@ -118,7 +118,7 @@ export function Footer() {
         <div>
           <Logo />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink-400">
-            Find It · Apply It · Get It — AI Career Copilot to analyze, improve, and personalize every application to land your dream job.
+            Find It · Apply It · Get It — JOB ASAP to analyze, improve, and personalize every application to land your dream job.
           </p>
           <Badge tone="brand" className="mt-4">
             <span className="h-1.5 w-1.5 animate-pulse-soft rounded-full bg-orange-400 shadow-[0_0_8px_rgba(249,115,22,.9)]" /> AI Career Engine · Active
@@ -144,7 +144,7 @@ export function Footer() {
       </div>
       <div className="relative border-t border-white/8">
         <div className="container-x flex flex-col items-center justify-between gap-3 py-5 text-xs text-ink-400/80 sm:flex-row">
-          <p>© 2026 JOB ASAP · AI Resume & Career Copilot</p>
+          <p>© 2026 JOB ASAP</p>
           <p>Match & ATS scores are internal assessments — not employer ATS results.</p>
         </div>
       </div>

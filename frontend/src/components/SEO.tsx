@@ -14,7 +14,7 @@ export const SEO: React.FC<SEOProps> = ({
   type = 'website',
   name = 'JOB ASAP'
 }) => {
-  const fullTitle = title ? `${title} | ${name}` : `${name} — AI Resume Builder & Career Copilot`;
+  const fullTitle = title ? `${title} | ${name}` : `${name} — AI Resume Builder`;
   const defaultDescription = "Upload your resume, paste a job description, and let JOB ASAP analyze your job match, improve your resume, write cover letters, and run mock interviews. Get hired faster.";
   const finalDescription = description || defaultDescription;
 
