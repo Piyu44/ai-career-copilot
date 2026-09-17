@@ -10,7 +10,7 @@ import {
 import { CategoryBars } from "../components/charts";
 import { UpgradeModal } from "../components/sections";
 import { useAuth, useData, useToast } from "../context";
-import { usePageMeta } from "../hooks";
+import { SEO } from "../components/SEO";
 import { atsCheck, improveResume, type AtsResult, type ImproveResult } from "../services/ai";
 import { fileStorage } from "../services/api";
 import { CREDIT_COSTS } from "../data";
@@ -19,7 +19,7 @@ import { cn, copyText, downloadDocx, downloadPdf, jobCtx, uid } from "../utils";
 /* ============================== RESUME TOOLS =============================== */
 
 export function ResumeToolsPage() {
-  usePageMeta("AI Resume Builder — Improve your resume with AI", "Rewrite your resume for a specific job: stronger verbs, JD-targeted skills, honest suggestions.");
+  
   const { user, spendCredits } = useAuth();
   const { resumes, analyses, saveResume } = useData();
   const { toast } = useToast();
@@ -129,6 +129,7 @@ export function ResumeToolsPage() {
 
   return (
     <div className="animate-fade-up">
+      <SEO title="AI Resume Builder — Improve your resume with AI" description="Rewrite your resume for a specific job: stronger verbs, JD-targeted skills, honest suggestions." />
       <PageHeader
         eyebrow={`Resume Tools · ${CREDIT_COSTS.improve} credits per run`}
         title="Resume Improvement"
@@ -288,6 +289,7 @@ export function ResumeToolsPage() {
 function SectionBlock({ title, children, onRegen, busy }: { title: string; children: React.ReactNode; onRegen?: () => void; busy?: boolean }) {
   return (
     <div>
+      <SEO title="AI Resume Builder — Improve your resume with AI" description="Rewrite your resume for a specific job: stronger verbs, JD-targeted skills, honest suggestions." />
       <div className="mb-2 flex items-center justify-between">
         <h3 className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-700">{title}</h3>
         {onRegen && (
@@ -304,7 +306,6 @@ function SectionBlock({ title, children, onRegen, busy }: { title: string; child
 /* =============================== ATS CHECKER =============================== */
 
 export function AtsCheckerPage() {
-  usePageMeta("ATS Resume Checker — Free ATS score check", "Check formatting, structure, keywords and readability. Clearly labelled as our assessment, not an employer ATS.");
   const { user, spendCredits } = useAuth();
   const { resumes } = useData();
   const { toast } = useToast();
@@ -340,6 +341,7 @@ export function AtsCheckerPage() {
 
   return (
     <div className="animate-fade-up">
+      <SEO title="AI Resume Builder — Improve your resume with AI" description="Rewrite your resume for a specific job: stronger verbs, JD-targeted skills, honest suggestions." />
       <PageHeader
         eyebrow={`ATS Checker · ${CREDIT_COSTS.ats} credits`}
         title="ATS Resume Checker"

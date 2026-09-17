@@ -2,12 +2,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Mail, Phone, MapPin, ShieldCheck, FileText, RefreshCw, HelpCircle } from "lucide-react";
 import { Card, Badge, Button } from "../components/ui";
-import { usePageMeta } from "../hooks";
+import { SEO } from "../components/SEO";
 
 export function TermsPage() {
-  usePageMeta("Terms & Conditions — JOB ASAP");
   return (
-    <div className="container-x py-16">
+    <>
+      <SEO title="Terms & Conditions" />
+      <div className="container-x py-16">
       <div className="mx-auto max-w-3xl">
         <Link to="/" className="mb-6 inline-flex items-center gap-2 text-sm text-ink-400 hover:text-brand-300">
           <ArrowLeft className="h-4 w-4" /> Back to Home
@@ -49,13 +50,15 @@ export function TermsPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
 export function PrivacyPolicyPage() {
-  usePageMeta("Privacy Policy — JOB ASAP");
   return (
-    <div className="container-x py-16">
+    <>
+      <SEO title="Privacy Policy" />
+      <div className="container-x py-16">
       <div className="mx-auto max-w-3xl">
         <Link to="/" className="mb-6 inline-flex items-center gap-2 text-sm text-ink-400 hover:text-brand-300">
           <ArrowLeft className="h-4 w-4" /> Back to Home
@@ -89,13 +92,15 @@ export function PrivacyPolicyPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
 export function RefundPolicyPage() {
-  usePageMeta("Cancellation & Refund Policy — JOB ASAP");
   return (
-    <div className="container-x py-16">
+    <>
+      <SEO title="Cancellation & Refund Policy" />
+      <div className="container-x py-16">
       <div className="mx-auto max-w-3xl">
         <Link to="/" className="mb-6 inline-flex items-center gap-2 text-sm text-ink-400 hover:text-brand-300">
           <ArrowLeft className="h-4 w-4" /> Back to Home
@@ -128,13 +133,15 @@ export function RefundPolicyPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
 export function ContactUsPage() {
-  usePageMeta("Contact Us — JOB ASAP");
   return (
-    <div className="container-x py-16">
+    <>
+      <SEO title="Contact Us" />
+      <div className="container-x py-16">
       <div className="mx-auto max-w-3xl">
         <Link to="/" className="mb-6 inline-flex items-center gap-2 text-sm text-ink-400 hover:text-brand-300">
           <ArrowLeft className="h-4 w-4" /> Back to Home
@@ -169,6 +176,7 @@ export function ContactUsPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

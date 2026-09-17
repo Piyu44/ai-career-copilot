@@ -5,7 +5,7 @@ import {
 import { Badge, Button, Card, EmptyState, Field, Input, PageHeader, Skeleton, Textarea } from "../components/ui";
 import { UpgradeModal } from "../components/sections";
 import { useAuth, useData, useToast } from "../context";
-import { usePageMeta } from "../hooks";
+import { SEO } from "../components/SEO";
 import { generateCoverLetter, type LetterTone } from "../services/ai";
 import { api } from "../services/api";
 import { CREDIT_COSTS } from "../data";
@@ -19,7 +19,7 @@ const TONES: { id: LetterTone; desc: string }[] = [
 ];
 
 export default function CoverLetterPage() {
-  usePageMeta("AI Cover Letter Generator — Personalized cover letters", "Generate a cover letter from your resume and the job description, in your chosen tone.");
+  
   const { user, spendCredits } = useAuth();
   const { resumes } = useData();
   const { toast } = useToast();
@@ -88,6 +88,7 @@ export default function CoverLetterPage() {
 
   return (
     <div className="animate-fade-up">
+      <SEO title="AI Cover Letter Generator — Personalized cover letters" description="Generate a cover letter from your resume and the job description, in your chosen tone." />
       <PageHeader
         eyebrow={`Cover Letter · ${CREDIT_COSTS.coverLetter} credits`}
         title="Cover Letter Generator"

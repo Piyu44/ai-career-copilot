@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from "react";
-import { HashRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { AppProviders, useAuth } from "./context";
 import { GuestOnly, Protected, PublicLayout } from "./components/layout";
 import { Logo } from "./components/ui";
@@ -59,7 +59,7 @@ function AuthGate() {
 export default function App() {
   return (
     <AppProviders>
-      <HashRouter>
+      <BrowserRouter>
         <ScrollToTop />
         <Suspense fallback={<PageLoader />}>
           <Routes>
@@ -97,7 +97,8 @@ export default function App() {
             </Route>
           </Routes>
         </Suspense>
-      </HashRouter>
+      </BrowserRouter>
     </AppProviders>
   );
 }
+

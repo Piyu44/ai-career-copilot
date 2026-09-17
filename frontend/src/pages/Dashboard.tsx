@@ -7,14 +7,14 @@ import {
 import { Badge, Button, Card, EmptyState, PageHeader, Skeleton, StatCard } from "../components/ui";
 import { TrendArea } from "../components/charts";
 import { useAuth, useData } from "../context";
-import { usePageMeta } from "../hooks";
+import { SEO } from "../components/SEO";
 import { jobCtx, timeAgo } from "../utils";
 import { CREDIT_COSTS } from "../data";
 
 const scoreTone = (s: number) => (s >= 75 ? "emerald" : s >= 60 ? "amber" : "rose") as "emerald" | "amber" | "rose";
 
 export default function Dashboard() {
-  usePageMeta("Dashboard — JOB ASAP");
+  
   const { user } = useAuth();
   const { analyses, applications, loading } = useData();
   const nav = useNavigate();
@@ -43,6 +43,7 @@ export default function Dashboard() {
 
   return (
     <div className="animate-fade-up">
+      <SEO title="Dashboard" />
       <PageHeader
         eyebrow="Dashboard"
         title={`${greeting}, ${firstName} 👋`}

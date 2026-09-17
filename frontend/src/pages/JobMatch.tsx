@@ -10,7 +10,7 @@ import {
 } from "../components/ui";
 import { UpgradeModal } from "../components/sections";
 import { useAuth, useData, useToast } from "../context";
-import { usePageMeta } from "../hooks";
+import { SEO } from "../components/SEO";
 import { analyzeJobMatch, type JobAnalysis } from "../services/ai";
 import { fileStorage, CREDIT_COST } from "../services/api";
 import { CREDIT_COSTS, DEMO_RESUME_TEXT, SAMPLE_JDS } from "../data";
@@ -24,7 +24,7 @@ const ANALYZE_STEPS = [
 ];
 
 export default function JobMatch() {
-  usePageMeta("Job Match Analysis — JOB ASAP", "Analyze your resume against any job description and get a match score with missing skills and keywords.");
+  
   const { user, spendCredits } = useAuth();
   const { resumes, addAnalysis } = useData();
   const { toast } = useToast();
@@ -164,7 +164,8 @@ export default function JobMatch() {
   /* ------------------------------ FORM VIEW ------------------------------ */
   if (step === "form") {
     return (
-      <div className="animate-fade-up">
+    <div className="animate-fade-up">
+      <SEO title="Job Match Analysis" description="Analyze your resume against any job description and get a match score with missing skills and keywords." />
         <PageHeader
           eyebrow={`Step ${1} of 2 · ${CREDIT_COSTS.analysis} credits`}
           title="Job Match Analysis"
@@ -338,7 +339,8 @@ export default function JobMatch() {
   /* --------------------------- ANALYZING VIEW ---------------------------- */
   if (step === "analyzing") {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <SEO title="Job Match Analysis" description="Analyze your resume against any job description and get a match score with missing skills and keywords." />
         <Card className="w-full max-w-md p-8">
           <div className="flex items-center gap-3">
             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100">
@@ -384,6 +386,7 @@ export default function JobMatch() {
 
   return (
     <div className="animate-fade-up">
+      <SEO title="Job Match Analysis" description="Analyze your resume against any job description and get a match score with missing skills and keywords." />
       <PageHeader
         eyebrow="Analysis report · internal assessment"
         title={`${a.jobTitle} — ${a.company}`}

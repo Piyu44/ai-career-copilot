@@ -8,7 +8,7 @@ import { Badge, Bar, Button, Card, PageHeader, Select } from "../components/ui";
 import { EvalRadar } from "../components/charts";
 import { UpgradeModal } from "../components/sections";
 import { useAuth, useToast } from "../context";
-import { usePageMeta } from "../hooks";
+import { SEO } from "../components/SEO";
 import { evaluateInterviewAnswer, pickQuestions, type AnswerEval } from "../services/ai";
 import { api } from "../services/api";
 import { CREDIT_COSTS, type BankQuestion, type InterviewDifficulty, type InterviewType } from "../data";
@@ -34,7 +34,7 @@ interface SessionRecord {
 }
 
 export default function InterviewPage() {
-  usePageMeta("AI Interview Simulator — Practice with AI", "Technical, HR and behavioral mock interviews with per-answer scoring and model answers.");
+  
   const { user, spendCredits } = useAuth();
   const { toast } = useToast();
 
@@ -131,7 +131,8 @@ export default function InterviewPage() {
   /* --------------------------------- setup -------------------------------- */
   if (phase === "setup") {
     return (
-      <div className="animate-fade-up">
+    <div className="animate-fade-up">
+      <SEO title="AI Interview Simulator — Practice with AI" description="Technical, HR and behavioral mock interviews with per-answer scoring and model answers." />
         <PageHeader
           eyebrow={`Interview Practice · ${CREDIT_COSTS.interview} credits per session`}
           title="AI Interview Simulator"
@@ -222,7 +223,8 @@ export default function InterviewPage() {
   if (phase === "session") {
     const q = questions[idx];
     return (
-      <div className="mx-auto max-w-3xl animate-fade-up">
+    <div className="mx-auto max-w-3xl animate-fade-up">
+      <SEO title="AI Interview Simulator — Practice with AI" description="Technical, HR and behavioral mock interviews with per-answer scoring and model answers." />
         <div className="mb-6">
           <div className="mb-2 flex items-center justify-between text-[13px] font-bold">
             <span className="text-ink-500 capitalize">{type} · {difficulty} · {role}</span>
@@ -331,6 +333,7 @@ export default function InterviewPage() {
 
   return (
     <div className="mx-auto max-w-4xl animate-fade-up">
+      <SEO title="AI Interview Simulator — Practice with AI" description="Technical, HR and behavioral mock interviews with per-answer scoring and model answers." />
       <PageHeader eyebrow="Session complete" title={`You averaged ${avg}/10`} desc={`${role} · ${type} · ${difficulty} — saved to your practice history.`} />
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <Card className="p-6">

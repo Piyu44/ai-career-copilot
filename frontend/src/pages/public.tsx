@@ -7,7 +7,7 @@ import {
 import { Badge, Button, Card, Cube, Field, Input, Logo, Orb, SceneShapes, TiltCard } from "../components/ui";
 import { FaqSection, PricingCards, SectionHead } from "../components/sections";
 import { useAuth, useToast, formatFirebaseError } from "../context";
-import { usePageMeta } from "../hooks";
+import { SEO } from "../components/SEO";
 import { ACTION_LABELS, CREDIT_COSTS } from "../data";
 import { DEMO_ACCOUNT } from "../services/api";
 import { firebaseForgotPassword } from "../services/firebaseAuth";
@@ -101,9 +101,9 @@ const FEATURE_ROWS = [
 ];
 
 export function FeaturesPage() {
-  usePageMeta("Features — JOB ASAP", "Job match analysis, resume improvement, cover letters, interview simulator, ATS checker and application tracking.");
   return (
     <>
+      <SEO title="Features" description="Job match analysis, resume improvement, cover letters, interview simulator, ATS checker and application tracking." />
       <section className="relative overflow-hidden">
         <SceneShapes variant="a" />
         <div className="container-x relative py-20 text-center">
@@ -161,10 +161,10 @@ export function FeaturesPage() {
 /* ================================ PRICING ================================ */
 
 export function PricingPage() {
-  usePageMeta("Pricing — JOB ASAP", "Free, Starter ₹199 and Pro ₹499 plans with transparent credit costs for every AI action.");
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
   return (
     <>
+      <SEO title="Pricing" description="Free, Starter ₹199 and Pro ₹499 plans with transparent credit costs for every AI action." />
       <section className="relative overflow-hidden">
         <SceneShapes variant="b" />
         <div className="container-x relative py-16 text-center">
@@ -283,7 +283,6 @@ const EMAIL_RE = /^[\w.+-]+@[\w-]+\.[\w.]+$/;
 const formError = "mb-4 rounded-lg bg-rose-400/10 px-4 py-3 text-sm font-semibold text-rose-300 ring-1 ring-rose-400/25";
 
 export function LoginPage() {
-  usePageMeta("Log in — JOB ASAP");
   const { login } = useAuth();
   const { toast } = useToast();
   const nav = useNavigate();
@@ -312,7 +311,9 @@ export function LoginPage() {
   };
 
   return (
-    <AuthShell title="Welcome back" sub="Log in to continue your job hunt.">
+    <>
+      <SEO title="Log in" />
+      <AuthShell title="Welcome back" sub="Log in to continue your job hunt.">
       {errors.form && <div className={formError}>{errors.form}</div>}
       <form onSubmit={submit} className="space-y-4" noValidate>
         <Field label="Email" error={errors.email}>
@@ -343,11 +344,11 @@ export function LoginPage() {
         New here? <Link to="/register" className="font-bold text-brand-300 hover:text-brand-200">Create a free account</Link>
       </p>
     </AuthShell>
+    </>
   );
 }
 
 export function RegisterPage() {
-  usePageMeta("Create account — JOB ASAP", "Sign up free with 10 credits. No card required.");
   const { register } = useAuth();
   const { toast } = useToast();
   const nav = useNavigate();
@@ -378,7 +379,9 @@ export function RegisterPage() {
   };
 
   return (
-    <AuthShell title="Create your free account" sub="10 credits on us. No card, no commitment.">
+    <>
+      <SEO title="Create account" description="Sign up free with 10 credits. No card required." />
+      <AuthShell title="Create your free account" sub="10 credits on us. No card, no commitment.">
       {errors.form && <div className={formError}>{errors.form}</div>}
       <form onSubmit={submit} className="space-y-4" noValidate>
         <Field label="Full name" error={errors.name}>
@@ -407,13 +410,13 @@ export function RegisterPage() {
         Already registered? <Link to="/login" className="font-bold text-brand-300 hover:text-brand-200">Log in</Link>
       </p>
     </AuthShell>
+    </>
   );
 }
 
 const successPanel = "rounded-xl bg-emerald-400/10 p-5 text-center ring-1 ring-emerald-400/25 animate-pop-in";
 
 export function ForgotPasswordPage() {
-  usePageMeta("Reset password — JOB ASAP");
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
@@ -439,7 +442,9 @@ export function ForgotPasswordPage() {
   };
 
   return (
-    <AuthShell title="Forgot your password?" sub="We'll email you a secure reset link.">
+    <>
+      <SEO title="Reset password" />
+      <AuthShell title="Forgot your password?" sub="We'll email you a secure reset link.">
       {sent ? (
         <div className={successPanel}>
           <Mail className="mx-auto h-8 w-8 text-emerald-300" />
@@ -460,17 +465,19 @@ export function ForgotPasswordPage() {
         </form>
       )}
     </AuthShell>
+    </>
   );
 }
 
 export function ResetPasswordPage() {
-  usePageMeta("Set new password — JOB ASAP");
   const [pw, setPw] = useState("");
   const [confirm, setConfirm] = useState("");
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
   return (
-    <AuthShell title="Set a new password" sub="Make it strong — your job hunt depends on it.">
+    <>
+      <SEO title="Set new password" />
+      <AuthShell title="Set a new password" sub="Make it strong — your job hunt depends on it.">
       {done ? (
         <div className={successPanel}>
           <CheckCircle2 className="mx-auto h-8 w-8 text-emerald-300" />
@@ -487,15 +494,17 @@ export function ResetPasswordPage() {
         </form>
       )}
     </AuthShell>
+    </>
   );
 }
 
 /* ================================== 404 =================================== */
 
 export function NotFoundPage() {
-  usePageMeta("Page not found — JOB ASAP");
   return (
-    <div className="relative flex min-h-[70vh] items-center justify-center overflow-hidden py-24">
+    <>
+      <SEO title="Page not found" />
+      <div className="relative flex min-h-[70vh] items-center justify-center overflow-hidden py-24">
       <div className="absolute inset-0 bg-grid-dark [mask-image:radial-gradient(60%_60%_at_50%_50%,black,transparent)]" />
       <Cube size={70} className="absolute left-[14%] top-[22%] opacity-60" />
       <Orb size={50} className="absolute right-[12%] bottom-[24%] opacity-70" />
@@ -509,5 +518,6 @@ export function NotFoundPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -62,21 +62,6 @@ export function useOnClickOutside(handler: () => void) {
   return ref;
 }
 
-/** Per-page SEO metadata (public pages are server-renderable later via sitemap-ready routes). */
-export function usePageMeta(title: string, description?: string) {
-  useEffect(() => {
-    document.title = title;
-    if (description) {
-      let meta = document.querySelector('meta[name="description"]');
-      if (!meta) {
-        meta = document.createElement("meta");
-        meta.setAttribute("name", "description");
-        document.head.appendChild(meta);
-      }
-      meta.setAttribute("content", description);
-    }
-  }, [title, description]);
-}
 
 /** Mouse-follow 3D tilt — sets --rx/--ry/--gx/--gy vars consumed by .tilt-card / .tilt-glare */
 export function useTilt<T extends HTMLElement = HTMLDivElement>(max = 7) {

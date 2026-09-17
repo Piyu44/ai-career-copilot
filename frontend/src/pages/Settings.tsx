@@ -6,14 +6,14 @@ import {
 import { Badge, Button, Card, Confirm, Field, Input, Modal, PageHeader, Toggle } from "../components/ui";
 import { RazorpayModal } from "../components/RazorpayModal";
 import { useAuth, useData, useToast } from "../context";
-import { usePageMeta } from "../hooks";
+import { SEO } from "../components/SEO";
 import { CURRENCY, PLANS, CREDIT_COSTS, ACTION_LABELS } from "../data";
 import { IS_MOCK_AI } from "../services/ai";
 import { DEMO_ACCOUNT } from "../services/api";
 import { cn, formatDate, timeAgo } from "../utils";
 
 export default function SettingsPage() {
-  usePageMeta("Settings — JOB ASAP");
+  
   const { user, updateUser, usage, logout, sendVerificationEmail, checkEmailVerified } = useAuth();
   const { resetAll } = useData();
   const { toast } = useToast();
@@ -59,6 +59,7 @@ export default function SettingsPage() {
 
   return (
     <div className="animate-fade-up">
+      <SEO title="Settings" />
       <PageHeader eyebrow="Settings" title="Account & Preferences" desc="Your profile, plan, credits and demo controls." />
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
